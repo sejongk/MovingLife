@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         if (m_bTrackingMode) {
             tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
             cur_lati = location.getLatitude(); cur_long = location.getLongitude();
+            /*  화면중심을 단말의 현재위치로 이동 */
+            tmapview.setTrackingMode(true);
+            tmapview.setSightVisible(true);
         }
     }
 
