@@ -157,8 +157,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             })
                             .setNeutralButton("예", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    setPoint.setText("출발지 설정");
-                                    setting = false;
                                     dest_lati = tMapPoint.getLatitude();
                                     dest_long = tMapPoint.getLongitude();
                                     Toast.makeText(getApplicationContext(), "도착지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude() + "로 설정되었습니다.", Toast.LENGTH_LONG).show();
@@ -201,8 +199,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             {
                                 public void onClick(DialogInterface dialog, int which)
                                 {
-                                    setPoint.setText("도착지 설정");
-                                    setting = true;
                                     dep_lati = tMapPoint.getLatitude(); dep_long = tMapPoint.getLongitude();
                                     Toast.makeText(getApplicationContext(), "출발지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude()+"로 설정되었습니다.", Toast.LENGTH_LONG).show();
                                     tmapview.removeAllMarkerItem();
@@ -249,6 +245,19 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
 
 
+            }
+        });
+        setPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(setting) {
+                    setPoint.setText("출발지 설정");
+                    setting = false;
+                }
+                else{
+                    setPoint.setText("도착지 설정");
+                    setting = true;
+                }
             }
         });
 
