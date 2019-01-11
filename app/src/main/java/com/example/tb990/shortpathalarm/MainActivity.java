@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapView;
 
@@ -43,11 +44,14 @@ public class MainActivity extends AppCompatActivity {
         final TMapView tMapView = new TMapView(this);
         tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
         linearLayoutTmap.addView( tMapView );
-/*
-        TMapPoint tpoint = tMapView.getLocationPoint();
-        double Latitude = tpoint.getLatitude();
-        double Longitude = tpoint.getLongitude();
-//setting
+
+        //현재 위치, 화면, 좌표 setting
+        TMapGpsManager tmapgps = new TMapGpsManager(this);
+        tmapgps.setProvider(TMapGpsManager.GPS_PROVIDER);
+        tmapgps.OpenGps();
+        TMapPoint cur_loc = tmapgps.getLocation();
+        double Latitude = cur_loc.getLatitude();
+        double Longitude = cur_loc.getLongitude();
         tMapView.setCenterPoint(Latitude, Longitude);
         tMapView.setLocationPoint(Latitude, Latitude);
    //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
