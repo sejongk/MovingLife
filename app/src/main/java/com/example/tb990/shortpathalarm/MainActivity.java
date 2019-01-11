@@ -3,6 +3,7 @@ package com.example.tb990.shortpathalarm;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,17 +40,32 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){ }
 
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
-        TMapView tMapView = new TMapView(this);
+        final TMapView tMapView = new TMapView(this);
         tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
+        linearLayoutTmap.addView( tMapView );
 
         TMapPoint tpoint = tMapView.getLocationPoint();
         double Latitude = tpoint.getLatitude();
         double Longitude = tpoint.getLongitude();
-
+//setting
         tMapView.setCenterPoint(Latitude, Longitude);
         tMapView.setLocationPoint(Latitude, Latitude);
+   //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
+    //    tMapView.setIcon();
+        //void setTMapPathIcon(Bitmap start, Bitmap end)
 
-        linearLayoutTmap.addView( tMapView );
+        tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
+            @Override
+            public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
+                //Toast.makeText(MapEvent.this, "onPress~!", Toast.LENGTH_SHORT).show();
+                tMapView.addTMapPOIItem(arrayList1);
+                return false;
+            }
+            @Override
+            public boolean onPressUpEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
+                return false;
+            }
+        });
 
         tMapView.setOnLongClickListenerCallback(new TMapView.OnLongClickListenerCallback() {
             @Override
@@ -71,8 +87,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which)
                             {
                                 dest_lati = tMapPoint.getLatitude(); dest_long = tMapPoint.getLongitude();
-                                String test ="lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude()+"로 설정되었습니다.";
-                                Toast.makeText(getApplicationContext(), test, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "도착지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude()+"로 설정되었습니다.", Toast.LENGTH_LONG).show();
 
                             }
                         })
