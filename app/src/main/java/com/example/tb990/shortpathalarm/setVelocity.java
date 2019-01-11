@@ -166,12 +166,6 @@ public class setVelocity extends AppCompatActivity{
                         } else {
                             Toast.makeText(getApplicationContext(), "출발지나 도착지가 똑바로 설정되지 않았습니다.", Toast.LENGTH_LONG).show();
                         }
-
-
-
-
-
-
                     }
                 });
         builder.setNegativeButton("취소",

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +15,11 @@ import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapPoint;
+import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
 
 import java.io.BufferedReader;
@@ -24,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
@@ -32,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
     private TMapGpsManager tmapgps = null;
     private TMapView tmapview = null;
-    private static String mApiKey = "앱키입력하기"; // 발급받은 appKey
     private static int mMarkerID;
 
     private ArrayList<TMapPoint> m_tmapPoint = new ArrayList<TMapPoint>();
@@ -45,12 +48,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     public void onLocationChange(Location location){
         if (m_bTrackingMode) {
             tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
+            cur_lati = location.getLatitude(); cur_long = location.getLongitude();
         }
     }
 
     double dest_long;
     double dest_lati;
     double velocity;
+    double distance;
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
         final TMapView tMapView = new TMapView(this);
         tmapview = tMapView;
-        tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
+       tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
         linearLayoutTmap.addView( tMapView );
 
         /* 현재 보는 방향 */
@@ -91,9 +96,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         /*  화면중심을 단말의 현재위치로 이동 */
         tmapview.setTrackingMode(true);
         tmapview.setSightVisible(true);
-
-        cur_long = tmapview.getLongitude();
-        cur_lati = tmapview.getLatitude();
 
         // 풍선에서 우측 버튼 클릭시 할 행동입니다
         tmapview.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback()
@@ -144,6 +146,19 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                 Toast.makeText(getApplicationContext(), "도착지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude()+"로 설정되었습니다.", Toast.LENGTH_LONG).show();
                                 tmapview.removeAllMarkerItem();
                                 showMarkerPoint(tMapPoint);
+                                TMapPoint tMapPointStart = new TMapPoint(cur_lati, cur_long); // SKT타워(출발지)
+                                TMapPoint tMapPointEnd = new TMapPoint(tMapPoint.getLatitude(), tMapPoint.getLongitude()); // N서울타워(목적지)
+                                TMapData tmapdata = new TMapData();
+                                tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
+                                    @Override
+                                    public void onFindPathData(TMapPolyLine tMapPolyLine) {
+                                        tMapPolyLine.setLineColor(Color.BLUE);
+                                        tMapPolyLine.setLineWidth(2);
+                                        tMapView.addTMapPolyLine("Line1", tMapPolyLine);
+                                        distance = tMapPolyLine.getDistance();
+                                        Log.d("거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+                                    }
+                                });
                             }
                         })
                         .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.

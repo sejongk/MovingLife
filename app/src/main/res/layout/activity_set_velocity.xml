@@ -9,33 +9,18 @@
     <LinearLayout
         android:id="@+id/linearLayoutTmap"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="66dp"></LinearLayout>
+        tools:layout_editor_absoluteY="0dp">
 
-    <Button
-        android:id="@+id/setTo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="From"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="6dp" />
+        <Button
+            android:id="@+id/getVelo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set Speed" />
 
-    <Button
-        android:id="@+id/setFrom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="To"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="6dp" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/getVelo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Time"
-        tools:layout_editor_absoluteX="280dp"
-        tools:layout_editor_absoluteY="6dp" />
 
 </android.support.constraint.ConstraintLayout>
