@@ -1,10 +1,13 @@
 package com.example.tb990.shortpathalarm;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PointF;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.skt.Tmap.TMapGpsManager;
+import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapView;
 
@@ -22,7 +26,28 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
+    private Context mContext = null;
+    private boolean m_bTrackingMode = true;
+
+    private TMapGpsManager tmapgps = null;
+    private TMapView tmapview = null;
+    private static String mApiKey = "앱키입력하기"; // 발급받은 appKey
+    private static int mMarkerID;
+
+    private ArrayList<TMapPoint> m_tmapPoint = new ArrayList<TMapPoint>();
+    private ArrayList<String> mArrayMarkerID = new ArrayList<String>();
+    private ArrayList<MapPoint> m_mapPoint = new ArrayList<MapPoint>();
+
+    double cur_lati=0;
+    double cur_long=0;
+    @Override
+    public void onLocationChange(Location location){
+        if (m_bTrackingMode) {
+            tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
+        }
+    }
+
     double dest_long;
     double dest_lati;
     double velocity;
@@ -30,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
 
         try {
             double loadVelo = Double.valueOf(load().toString());
@@ -42,19 +68,43 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
         final TMapView tMapView = new TMapView(this);
+        tmapview = tMapView;
         tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
         linearLayoutTmap.addView( tMapView );
 
-        //현재 위치, 화면, 좌표 setting
-        TMapGpsManager tmapgps = new TMapGpsManager(this);
-        tmapgps.setProvider(TMapGpsManager.GPS_PROVIDER);
+        /* 현재 보는 방향 */
+        tmapview.setCompassMode(true);
+        /* 현위치 아이콘표시 */
+        tmapview.setIconVisibility(true);
+        /* 줌레벨 */
+        tmapview.setZoomLevel(15);
+        tmapview.setMapType(TMapView.MAPTYPE_STANDARD);
+        tmapview.setLanguage(TMapView.LANGUAGE_KOREAN);
+        /* gps setting */
+        tmapgps = new TMapGpsManager(MainActivity.this);
+        tmapgps.setMinTime(1000);
+        tmapgps.setMinDistance(5);
+        tmapgps.setProvider(tmapgps.NETWORK_PROVIDER); //연결된 인터넷으로 현 위치를 받습니다.
+        //실내일 때 유용합니다.
+        //tmapgps.setProvider(tmapgps.GPS_PROVIDER); //gps로 현 위치를 잡습니다.
         tmapgps.OpenGps();
-        TMapPoint cur_loc = tmapgps.getLocation();
-        double Latitude = cur_loc.getLatitude();
-        double Longitude = cur_loc.getLongitude();
-        tMapView.setLocationPoint(Latitude, Longitude);
-        tMapView.setCenterPoint(Latitude, Longitude);
-   //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
+        /*  화면중심을 단말의 현재위치로 이동 */
+        tmapview.setTrackingMode(true);
+        tmapview.setSightVisible(true);
+
+        cur_long = tmapview.getLongitude();
+        cur_lati = tmapview.getLatitude();
+
+        // 풍선에서 우측 버튼 클릭시 할 행동입니다
+        tmapview.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback()
+        {
+            @Override
+            public void onCalloutRightButton(TMapMarkerItem markerItem) {
+                Toast.makeText(MainActivity.this, "클릭", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
     //    tMapView.setIcon();
         //void setTMapPathIcon(Bitmap start, Bitmap end)
 
@@ -76,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             public void onLongPressEvent(ArrayList arrayList, ArrayList arrayList1, final TMapPoint tMapPoint) {
                 AlertDialog.Builder oDialog = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog);
                 oDialog.setMessage("도착지로 설정하시겠습니까?")
-                        .setTitle("일반 Dialog")
+                        .setTitle("도착지 설정")
                         .setPositiveButton("아니오", new DialogInterface.OnClickListener()
                         {
                             @Override
@@ -92,7 +142,8 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 dest_lati = tMapPoint.getLatitude(); dest_long = tMapPoint.getLongitude();
                                 Toast.makeText(getApplicationContext(), "도착지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude()+"로 설정되었습니다.", Toast.LENGTH_LONG).show();
-
+                                tmapview.removeAllMarkerItem();
+                                showMarkerPoint(tMapPoint);
                             }
                         })
                         .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
@@ -101,6 +152,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    public void showMarkerPoint(TMapPoint point) {// 마커 찍는거 빨간색 포인트.
+        TMapMarkerItem markerItem1 = new TMapMarkerItem();
+        TMapPoint tMapPoint1 = point; // SKT타워
+
+// 마커 아이콘
+      //  Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.locicon);
+      //  markerItem1.setIcon(bitmap); // 마커 아이콘 지정
+        markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
+        markerItem1.setTMapPoint( tMapPoint1 ); // 마커의 좌표 지정
+        markerItem1.setName("도착지"); // 마커의 타이틀 지정
+        tmapview.addMarkerItem("markerItem1", markerItem1); // 지도에 마커 추가
+        tmapview.setCenterPoint( point.getLongitude(), point.getLatitude() );
+    }
+
 
     public StringBuilder load(){
         FileInputStream fis = null;
