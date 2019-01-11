@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         final TMapView tMapView = new TMapView(this);
         tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
         linearLayoutTmap.addView( tMapView );
-
+/*
         TMapPoint tpoint = tMapView.getLocationPoint();
         double Latitude = tpoint.getLatitude();
         double Longitude = tpoint.getLongitude();
@@ -53,11 +53,11 @@ public class MainActivity extends AppCompatActivity {
    //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
     //    tMapView.setIcon();
         //void setTMapPathIcon(Bitmap start, Bitmap end)
-
+*/
         tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
-                //Toast.makeText(MapEvent.this, "onPress~!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "onPress~!", Toast.LENGTH_SHORT).show();
                 tMapView.addTMapPOIItem(arrayList1);
                 return false;
             }
