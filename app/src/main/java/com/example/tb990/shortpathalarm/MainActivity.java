@@ -52,12 +52,12 @@ public class MainActivity extends AppCompatActivity {
         TMapPoint cur_loc = tmapgps.getLocation();
         double Latitude = cur_loc.getLatitude();
         double Longitude = cur_loc.getLongitude();
+        tMapView.setLocationPoint(Latitude, Longitude);
         tMapView.setCenterPoint(Latitude, Longitude);
-        tMapView.setLocationPoint(Latitude, Latitude);
    //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
     //    tMapView.setIcon();
         //void setTMapPathIcon(Bitmap start, Bitmap end)
-*/
+
         tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
