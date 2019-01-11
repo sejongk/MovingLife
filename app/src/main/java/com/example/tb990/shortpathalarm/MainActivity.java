@@ -251,11 +251,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             @Override
             public void onClick(View v) {
                 if(setting) {
-                    setPoint.setText("출발지 설정");
+                    setPoint.setText("도착지 설정");
                     setting = false;
                 }
                 else{
-                    setPoint.setText("도착지 설정");
+                    setPoint.setText("출발지 설정");
                     setting = true;
                 }
             }
