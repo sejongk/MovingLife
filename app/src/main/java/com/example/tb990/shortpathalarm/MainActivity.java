@@ -18,9 +18,12 @@ import android.widget.Toast;
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapMarkerItem;
+import com.skt.Tmap.TMapPOIItem;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
+
+import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -29,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
     private Context mContext = null;
@@ -41,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private ArrayList<TMapPoint> m_tmapPoint = new ArrayList<TMapPoint>();
     private ArrayList<String> mArrayMarkerID = new ArrayList<String>();
     private ArrayList<MapPoint> m_mapPoint = new ArrayList<MapPoint>();
+    ArrayList POIItem;
 
     double cur_lati=0;
     double cur_long=0;
@@ -49,6 +55,18 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         if (m_bTrackingMode) {
             tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
             cur_lati = location.getLatitude(); cur_long = location.getLongitude();
+            TMapPoint tpoint = new TMapPoint(cur_lati,cur_long);
+            TMapData tmapdata = new TMapData();
+            try {
+                POIItem = tmapdata.findAroundNamePOI(tpoint, "버스");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -180,6 +198,37 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapview.addMarkerItem("markerItem1", markerItem1); // 지도에 마커 추가
         tmapview.setCenterPoint( point.getLongitude(), point.getLatitude() );
     }
+
+    public void showMarkerPoints() {// 마커 찍는거 빨간색 포인트.
+        for (int i = 0; i < POIItem.size(); i++) {
+            TMapPOIItem tMapPOIItem = (TMapPOIItem)POIItem.get(i);
+    //        TMapPoint point = new TMapPoint(tMapPOIItem.frontLat, tMapPOIItem.frontLon);
+            TMapMarkerItem item1 = new TMapMarkerItem();
+            Bitmap bitmap = null;
+            //poi_dot은 지도에 꼽을 빨간 핀 이미지입니다
+
+       //     item1.setTMapPoint(point);
+            item1.setName(m_mapPoint.get(i).getName());
+            item1.setVisible(item1.VISIBLE);
+
+            item1.setIcon(bitmap);
+
+
+            // 풍선뷰 안의 항목에 글을 지정합니다.
+            item1.setCalloutTitle(m_mapPoint.get(i).getName());
+            item1.setCalloutSubTitle("서울");
+            item1.setCanShowCallout(true);
+            item1.setAutoCalloutVisible(true);
+
+
+
+            String strID = String.format("pmarker%d", mMarkerID++);
+
+            tmapview.addMarkerItem(strID, item1);
+            mArrayMarkerID.add(strID);
+        }
+    }
+
 
 
     public StringBuilder load(){
