@@ -49,12 +49,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
     private TMapGpsManager tmapgps = null;
     private TMapView tmapview = null;
-    private static int mMarkerID;
-
-    private ArrayList<TMapPoint> m_tmapPoint = new ArrayList<TMapPoint>();
-    private ArrayList<String> mArrayMarkerID = new ArrayList<String>();
-    private ArrayList<MapPoint> m_mapPoint = new ArrayList<MapPoint>();
-    ArrayList POIItem;
 
     double cur_lati=0;
     double cur_long=0;
@@ -97,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         linearLayoutTmap.addView( tMapView );
 
         /* 현재 보는 방향 */
-        tmapview.setCompassMode(true);
+       tmapview.setCompassMode(true);
         /* 현위치 아이콘표시 */
         tmapview.setIconVisibility(true);
         /* 줌레벨 */
@@ -163,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                 Toast.makeText(getApplicationContext(), "도착지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude()+"로 설정되었습니다.", Toast.LENGTH_LONG).show();
                                 tmapview.removeAllMarkerItem();
                                 showMarkerPoint(tMapPoint);
-                                TMapPoint tMapPointStart = new TMapPoint(cur_lati, cur_long); // SKT타워(출발지)
+                                TMapPoint tMapPointStart = new TMapPoint(cur_lati, cur_long);
                                 TMapPoint tMapPointEnd = new TMapPoint(tMapPoint.getLatitude(), tMapPoint.getLongitude()); // N서울타워(목적지)
                                 TMapData tmapdata = new TMapData();
                                 tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
@@ -186,8 +180,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         setAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Log.e("distance",Double.toString(distance));
+                Log.e("velocity",Double.toString(velocity));
                 double exp_time = distance / velocity;
+                Log.e("time",Double.toString(exp_time));
+
                 final int exp_hour = (int)exp_time / 60;
                 final int exp_minutes = (int) exp_time % 60;
                 TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {

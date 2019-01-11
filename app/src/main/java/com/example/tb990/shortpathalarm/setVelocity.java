@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.skt.Tmap.TMapData;
+import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
@@ -32,7 +34,7 @@ import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class setVelocity extends AppCompatActivity{
+public class setVelocity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback{
     final static String filename = "savedVelo.txt";
     double toLong=0;
     double toLati=0;
@@ -42,6 +44,19 @@ public class setVelocity extends AppCompatActivity{
     boolean setLoc = true; //true면 출발지, false면 도착지
 
     static double velocity;
+    private boolean m_bTrackingMode = true;
+    private TMapGpsManager tmapgps = null;
+    private TMapView tmapview = null;
+
+    double cur_lati=0;
+    double cur_long=0;
+    @Override
+    public void onLocationChange(Location location){
+        if (m_bTrackingMode) {
+            tmapview.setLocationPoint(location.getLongitude(), location.getLatitude());
+            cur_lati = location.getLatitude(); cur_long = location.getLongitude();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -62,9 +77,30 @@ public class setVelocity extends AppCompatActivity{
         Button getVelo = (Button)findViewById(R.id.getVelo);
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
         TMapView tMapView = new TMapView(this);
-       // tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
-        tMapView.setCenterPoint(126.985022, 37.566474);
+        tmapview = tMapView;
+        tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
         linearLayoutTmap.addView( tMapView );
+
+        /* 현재 보는 방향 */
+        tmapview.setCompassMode(true);
+        /* 현위치 아이콘표시 */
+        tmapview.setIconVisibility(true);
+        /* 줌레벨 */
+        tmapview.setZoomLevel(15);
+        tmapview.setMapType(TMapView.MAPTYPE_STANDARD);
+        tmapview.setLanguage(TMapView.LANGUAGE_KOREAN);
+        /* gps setting */
+        tmapgps = new TMapGpsManager(setVelocity.this);
+        tmapgps.setMinTime(1000);
+        tmapgps.setMinDistance(5);
+        tmapgps.setProvider(tmapgps.NETWORK_PROVIDER); //연결된 인터넷으로 현 위치를 받습니다.
+        //실내일 때 유용합니다.
+        //tmapgps.setProvider(tmapgps.GPS_PROVIDER); //gps로 현 위치를 잡습니다.
+        tmapgps.OpenGps();
+        /*  화면중심을 단말의 현재위치로 이동 */
+        tmapview.setTrackingMode(true);
+        tmapview.setSightVisible(true);
+
 
         tMapView.setOnLongClickListenerCallback(new TMapView.OnLongClickListenerCallback() {
             @Override
@@ -160,6 +196,8 @@ public class setVelocity extends AppCompatActivity{
                                     Log.e("속력:", Double.toString(velocity) );
                                     String veloText = Double.toString(velocity);
                                     save(veloText);
+                                    Intent intent = new Intent(setVelocity.this, MainActivity.class);
+                                    startActivity(intent);
 
                                 }
                             });
