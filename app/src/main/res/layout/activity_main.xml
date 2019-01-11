@@ -19,6 +19,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="알람 설정" />
+
+        <Button
+            android:id="@+id/setPoint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="도착지 설정" />
     </LinearLayout>
 
 
