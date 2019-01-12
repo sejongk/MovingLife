@@ -316,7 +316,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                }catch (JSONException e){e.printStackTrace();}
             }
         });
-
+        Button busTest = (Button)findViewById(R.id.busTest);
+        busTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               Intent intent = new Intent(MainActivity.this, busArrival.class);
+               startActivity(intent);
+            }
+        });
     }
     public void showMarkerPoint(TMapPoint point) {// 마커 찍는거 빨간색 포인트.
         TMapMarkerItem markerItem1 = new TMapMarkerItem();
@@ -411,13 +418,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         BufferedReader reader = null;
         StringBuffer buffer = new StringBuffer();
         JSONObject obj;
-        getStops(JSONObject obj){
-            this.obj=obj;
+
+        getStops(JSONObject obj) {
+            this.obj = obj;
         }
+
         @Override
         protected String doInBackground(Void... params) {
             try {
-                String $url_json ="http://143.248.140.106:3280/getStops";
+                String $url_json = "http://143.248.140.106:3280/getStops";
                 URL url = new URL($url_json);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");
@@ -438,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 InputStream stream = urlConnection.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(stream));
                 String line = "";
-                while((line = reader.readLine()) != null){
+                while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
             } catch (Exception e) {
@@ -454,14 +463,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 tmapview.removeAllMarkerItem();
                 ArrayList<MapPoint> tmp_bus = new ArrayList<>();
                 JSONArray arr = new JSONArray(strJson);
-                for(int i=0;i<arr.length();i++){
-                 JSONObject obj = arr.getJSONObject(i);
-                 MapPoint point = new MapPoint(obj.getString("name"),Double.valueOf(obj.getString("latitude")),Double.valueOf(obj.getString("longitude")));
-                 tmp_bus.add(point);
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    MapPoint point = new MapPoint(obj.getString("name"), Double.valueOf(obj.getString("latitude")), Double.valueOf(obj.getString("longitude")));
+                    tmp_bus.add(point);
                     TMapMarkerItem markerItem1 = new TMapMarkerItem();
-                    TMapPoint tMapPoint1 = new TMapPoint(point.getLatitude(),point.getLongitude()); // SKT타워
+                    TMapPoint tMapPoint1 = new TMapPoint(point.getLatitude(), point.getLongitude()); // SKT타워
                     markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
-                    markerItem1.setTMapPoint( tMapPoint1 ); // 마커의 좌표 지정
+                    markerItem1.setTMapPoint(tMapPoint1); // 마커의 좌표 지정
                     markerItem1.setName(obj.getString("name")); // 마커의
 
 
@@ -469,120 +478,13 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                     markerItem1.setCalloutTitle(obj.getString("name"));
                     markerItem1.setCalloutSubTitle("버스 정류장");
                     markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부
-                    tmapview.addMarkerItem("bus"+obj.getString("id"), markerItem1); // 지도에 마커 추가
+                    tmapview.addMarkerItem("bus" + obj.getString("id"), markerItem1); // 지도에 마커 추가
                 }
 
-            }catch(JSONException e){
-                e.printStackTrace();
-            }
-        }
-
-        private JSONArray ArriveInfo(String stopId) {
-            StrictMode.enableDefaults(); //TODO 마법의 단어같은데 뭔지 모르겠음
-            JSONObject data = new JSONObject();
-            JSONArray jsonArray = new JSONArray();
-
-            String urlstr = "http://openapitraffic.daejeon.go.kr/api/rest/arrive/getArrInfoByStopID?" +
-                    "serviceKey=Y7P4OnJUKz%2BdXlsbpmPWg41oVpkLNOMQgUi2T5Dml8l0J57zY8RWUqEvcgnOLYa%2FrfGtqiWdraowCUmrQH1uSw%3D%3D&BusStopID=" +
-                    stopId;
-
-            try {
-                //아래 두 문장 무슨 뜻인지 모르겠음. 하니까 되긴함 UntaggedSocket에러 해결 문제.
-                int THREAD_ID = 10000;
-                TrafficStats.setThreadStatsTag(THREAD_ID);
-
-                URL url = new URL(urlstr); //검색 URL부분
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                InputStream is = urlConnection.getInputStream();
-
-                XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
-                XmlPullParser parser = parserFactory.newPullParser();
-                parser.setInput(is, "UTF-8");
-
-                boolean target = false;
-                String startTag = "";
-                //차량번호, 도착예정시간, 메세지 유형, 노선번호, 잔여정류장 수
-                //EXTIME_MIN, MSP_TP, ROUTE_NO, STATUS_POS
-                int eventType = parser.getEventType();
-                JSONObject jsonObject = new JSONObject();
-                String tmp_tag = "";
-                while (eventType != XmlPullParser.END_DOCUMENT) {
-                    if (eventType == XmlPullParser.START_TAG) {
-                        tmp_tag = parser.getName();
-                        startTag = parser.getName();
-                        if (startTag.equals("EXTIME_MIN")) {
-                            jsonObject = new JSONObject();
-                            target = true;
-                        }
-                        if (startTag.equals("MSG_TP") || startTag.equals("ROUTE_NO") || startTag.equals("STATUS_POS")) {
-                            target = true;
-                        }
-                    } else if (eventType == XmlPullParser.TEXT) {
-                        String text = parser.getText();
-                        if (target) {
-                            jsonObject.put(startTag, text);
-                            target = false;
-                            if (tmp_tag.equals("STATUS_POS")) {
-                                jsonArray.put(jsonObject);
-                            }
-                        }
-                    }
-                    eventType = parser.next();
-                }
-                Log.e("!!!end", jsonArray.toString());
-                data.put("!!!data", jsonArray);
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return jsonArray;
         }
 
-        private class ParseTask extends AsyncTask<Void, Void, String> {
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-            String stopId;
-            JSONArray obj;
-
-            ParseTask(String stopId) {
-                this.stopId = stopId;
-                obj = ArriveInfo(stopId);
-            }
-
-            @Override
-            protected String doInBackground(Void... params) {
-                try {
-                    //String $url_json ="http://143.248.140.106:3280/get";
-                /*URL url = new URL($url_json);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
-                resultJson = buffer.toString();
-                // Log.d("FOR_LOG", resultJson);
-                */
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return obj.toString();
-            }
-        }
-
+    }
 }
