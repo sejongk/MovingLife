@@ -444,13 +444,27 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         protected void onPostExecute(String strJson) {
             super.onPostExecute(strJson);
             try {
+                tmapview.removeAllMarkerItem();
+                ArrayList<MapPoint> tmp_bus = new ArrayList<>();
                 JSONArray arr = new JSONArray(strJson);
                 for(int i=0;i<arr.length();i++){
                  JSONObject obj = arr.getJSONObject(i);
-                 Log.e("test",obj.getString("name"));
                  MapPoint point = new MapPoint(obj.getString("name"),Double.valueOf(obj.getString("latitude")),Double.valueOf(obj.getString("longitude")));
-                 busStops.add(point);
+                 tmp_bus.add(point);
+                    TMapMarkerItem markerItem1 = new TMapMarkerItem();
+                    TMapPoint tMapPoint1 = new TMapPoint(point.getLatitude(),point.getLongitude()); // SKT타워
+                    markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
+                    markerItem1.setTMapPoint( tMapPoint1 ); // 마커의 좌표 지정
+                    markerItem1.setName(obj.getString("name")); // 마커의
+
+
+                    // 타이틀 지정
+                    markerItem1.setCalloutTitle(obj.getString("name"));
+                    markerItem1.setCalloutSubTitle("버스 정류장");
+                    markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부
+                    tmapview.addMarkerItem("bus"+obj.getString("id"), markerItem1); // 지도에 마커 추가
                 }
+
             }catch(JSONException e){
                 e.printStackTrace();
             }
