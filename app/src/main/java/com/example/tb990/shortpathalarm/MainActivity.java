@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             tmapview.setSightVisible(true);
         }
     }
-    double dep_long;
-    double dep_lati;
+    double dep_long=0;
+    double dep_lati=0;
     double dest_long;
     double dest_lati;
     double velocity;
@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                     if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
                                     else tMapPointStart = new TMapPoint(cur_lati, cur_long);
                                     TMapPoint tMapPointEnd = new TMapPoint(tMapPoint.getLatitude(), tMapPoint.getLongitude()); // N서울타워(목적지)
+                                    TMapData tmapdata = new TMapData();
                                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
                                         @Override
                                         public void onFindPathData(TMapPolyLine tMapPolyLine) {
@@ -173,10 +174,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                             tMapPolyLine.setLineWidth(2);
                                             tMapView.addTMapPolyLine("Line1", tMapPolyLine);
                                             distance = tMapPolyLine.getDistance();
-                                            Log.d("거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+                                            Log.d("도착지 설정거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+                                            showMarkerPoint(tMapPoint);
                                         }
                                     });
-                                    showMarkerPoint(tMapPoint);
                                 }
                             })
                             .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
@@ -212,10 +213,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                             tMapPolyLine.setLineWidth(2);
                                             tMapView.addTMapPolyLine("Line1", tMapPolyLine);
                                             distance = tMapPolyLine.getDistance();
-                                            Log.d("거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+                                            Log.d("출발지 설정거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+                                            showMarkerPoint(tMapPoint);
+
                                         }
                                     });
-                                    showMarkerPoint(tMapPoint);
                                 }
                             })
                             .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
@@ -300,9 +302,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         TMapPoint tMapPoint1 = point; // SKT타워
         markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
         markerItem1.setTMapPoint( tMapPoint1 ); // 마커의 좌표 지정
-        markerItem1.setName("도착지"); // 마커의 타이틀 지정
         markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부
-        markerItem1.setCalloutTitle("도착지");
+        if(setting) {
+            markerItem1.setName("도착지"); // 마커의 타이틀 지정
+            markerItem1.setCalloutTitle("도착지");
+        }
+        else{
+            markerItem1.setName("출발지"); // 마커의 타이틀 지정
+            markerItem1.setCalloutTitle("출발지");
+        }
         markerItem1.setCalloutSubTitle("소요시간은 "+ exp_time);
         tmapview.addMarkerItem("markerItem1", markerItem1); // 지도에 마커 추가
         tmapview.setCenterPoint( point.getLongitude(), point.getLatitude() );
