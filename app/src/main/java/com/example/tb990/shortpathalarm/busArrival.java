@@ -45,7 +45,7 @@ public class busArrival extends AppCompatActivity {
 
         getBuslist getBus = new getBuslist("8002940");
         getBus.execute();
-
+        recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         adapter = new MainViewAdapter(this,list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
