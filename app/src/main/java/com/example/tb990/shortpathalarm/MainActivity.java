@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                     TMapPoint tMapPointStart;
                                     if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
                                     else tMapPointStart = new TMapPoint(cur_lati, cur_long);
-                                    TMapPoint tMapPointEnd = new TMapPoint(tMapPoint.getLatitude(), tMapPoint.getLongitude()); // N서울타워(목적지)
+                                    TMapPoint tMapPointEnd = new TMapPoint(dest_lati, dest_long); // N서울타워(목적지)
                                     TMapData tmapdata = new TMapData();
                                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
                                         @Override
@@ -274,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 final String strObj = edittext.getText().toString(); //검색어
+                                tmapview.removeAllMarkerItem();
                                 tmapdata.findAllPOI(strObj, new TMapData.FindAllPOIListenerCallback() {
                                     @Override
                                     public void onFindAllPOI(ArrayList poiItem) {
@@ -327,12 +328,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         TMapPoint tMapPointStart;
         if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
         else tMapPointStart = new TMapPoint(cur_lati, cur_long);
+        markerItem1.setCalloutSubTitle("검색 결과");
+        /*
         tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPoint1, new TMapData.FindPathDataListenerCallback() {
             @Override
             public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                markerItem1.setCalloutSubTitle("소요시간은 "+ new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+
             }
         });
+        */
         tmapview.addMarkerItem(name + point.toString(), markerItem1); // 지도에 마커 추가
     }
 
