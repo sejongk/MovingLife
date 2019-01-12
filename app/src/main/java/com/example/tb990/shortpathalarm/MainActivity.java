@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.provider.AlarmClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,13 +30,22 @@ import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +55,7 @@ import java.util.Date;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
+    ArrayList<MapPoint> busStops = new ArrayList<>();
     private Context mContext = null;
     private boolean m_bTrackingMode = true;
 
@@ -285,6 +296,19 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 builder.show();
             }
         });
+        Button getBus = (Button)findViewById(R.id.getBus);
+        getBus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               JSONObject sObj = new JSONObject();
+               try {
+                   sObj.accumulate("latitude", cur_lati);
+                   sObj.accumulate("longitude", cur_long);
+                   getStops gs = new getStops(sObj);
+                   gs.execute();
+               }catch (JSONException e){e.printStackTrace();}
+            }
+        });
 
     }
     public void showMarkerPoint(TMapPoint point) {// 마커 찍는거 빨간색 포인트.
@@ -373,6 +397,64 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             }
         }
         return sb;
+    }
+    private  class getStops extends AsyncTask<Void, Void, String> {
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        StringBuffer buffer = new StringBuffer();
+        JSONObject obj;
+        getStops(JSONObject obj){
+            this.obj=obj;
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+                String $url_json ="http://143.248.140.106:3280/getStops";
+                URL url = new URL($url_json);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Cache-Control", "no-cache");//캐시 설정
+                urlConnection.setRequestProperty("Content-Type", "application/json");//application JSON 형식으로 전송
+                urlConnection.setRequestProperty("Accept", "text/html");//서버에 response 데이터를 html로 받음
+                urlConnection.setDoOutput(true);//Outstream으로 post 데이터를 넘겨주겠다는 의미
+                urlConnection.setDoInput(true);//Inputstream으로 서버로부터 응답을 받겠다는 의미
+                urlConnection.connect();
+                //서버로 보내기위해서 스트림 만듬
+                OutputStream outStream = urlConnection.getOutputStream();
+                //버퍼를 생성하고 넣음
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
+                writer.write(obj.toString());
+                writer.flush();
+                writer.close();//버퍼를 받아줌
+
+                InputStream stream = urlConnection.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(stream));
+                String line = "";
+                while((line = reader.readLine()) != null){
+                    buffer.append(line);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return buffer.toString();//서버로 부터 받은 값을 리턴해줌 아마 OK!!가 들어올것임
+        }
+
+
+        protected void onPostExecute(String strJson) {
+            super.onPostExecute(strJson);
+            try {
+                JSONArray arr = new JSONArray(strJson);
+                for(int i=0;i<arr.length();i++){
+                 JSONObject obj = arr.getJSONObject(i);
+                 Log.e("test",obj.getString("name"));
+                 MapPoint point = new MapPoint(obj.getString("name"),Double.valueOf(obj.getString("latitude")),Double.valueOf(obj.getString("longitude")));
+                 busStops.add(point);
+                }
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
     }
 
 }
