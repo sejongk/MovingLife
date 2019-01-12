@@ -30,6 +30,7 @@ public class busArrival extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus_arrival);
         getBuslist getBus = new getBuslist("8002940");
+        getBus.execute();
     }
 
     private  class getBuslist extends AsyncTask<Void, Void, String> {
@@ -48,8 +49,8 @@ public class busArrival extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... params) {
             try {
-                String $url_json = "http://openapitraffic.daejeon.go.kr/api/rest/arrive/getArrInfoByStopID?" +
-                        "serviceKey=Y7P4OnJUKz%2BdXlsbpmPWg41oVpkLNOMQgUi2T5Dml8l0J57zY8RWUqEvcgnOLYa%2FrfGtqiWdraowCUmrQH1uSw%3D%3D&BusStopID=" + stopId;
+                String $url_json = "http://openapitraffic.daejeon.go.kr/api/rest/arrive/getArrInfoByStopID?serviceKey=" +
+                        "Y7P4OnJUKz%2BdXlsbpmPWg41oVpkLNOMQgUi2T5Dml8l0J57zY8RWUqEvcgnOLYa%2FrfGtqiWdraowCUmrQH1uSw%3D%3D&BusStopID="+stopId;
                 URL url = new URL($url_json);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
