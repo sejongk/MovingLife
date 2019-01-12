@@ -1,11 +1,20 @@
 package com.example.tb990.shortpathalarm;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.TrafficStats;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,15 +31,88 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class busArrival extends AppCompatActivity {
-
+    private RecyclerView recyclerView;
+    private MainViewAdapter adapter;
+    ArrayList<busInfo> list = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus_arrival);
+
         getBuslist getBus = new getBuslist("8002940");
         getBus.execute();
+
+        recyclerView.setHasFixedSize(true);
+        adapter = new MainViewAdapter(this,list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+    }
+
+    public class MainViewAdapter extends RecyclerView.Adapter<MainViewAdapter.Holder> {
+        private Context context;
+        private List<busInfo> list;
+        public MainViewAdapter(Context context,List<busInfo> list) {
+            this.context = context;
+            this.list = list;
+        }
+
+        // ViewHolder 생성
+        // row layout을 화면에 뿌려주고 holder에 연결
+        @Override
+        public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.bus_row, parent, false);
+            Holder holder = new Holder(view);
+            return holder;
+        }
+
+
+        @Override
+        public void onBindViewHolder(Holder holder, int position) {
+            // 각 위치에 문자열 세팅
+            final int itemposition = position;
+            holder.busNumText.setText(list.get(itemposition).busNum);
+            holder.busNumText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String busNum = list.get(itemposition).busNum;
+                    String extime_min = list.get(itemposition).extime_min;
+                    String status_pos = list.get(itemposition).status_pos;
+/*
+                    Intent intent = new Intent(this,PersonInfo.class);
+                    intent.putExtra("busNum",busNum);
+                    intent.putExtra("extime_min",extime_min);
+                    intent.putExtra("status_pos",status_pos);
+                    startActivity(intent);
+*/
+                }
+            });
+
+            // Log.e("StudyApp", "onBindViewHolder" + itemposition);
+        }
+
+        // 몇개의 데이터를 리스트로 뿌려줘야하는지 반드시 정의해줘야한다
+        @Override
+        public int getItemCount() {
+            return list.size(); // RecyclerView의 size return
+        }
+
+        // ViewHolder는 하나의 View를 보존하는 역할을 한다
+        public class Holder extends RecyclerView.ViewHolder{
+            public TextView extimeText;
+            public TextView busNumText;
+            public TextView posText;
+            public Holder(View view){
+                super(view);
+                busNumText = (TextView) view.findViewById(R.id.busNumText);
+            }
+        }
+
+
     }
 
     private  class getBuslist extends AsyncTask<Void, Void, String> {
@@ -108,7 +190,24 @@ public class busArrival extends AppCompatActivity {
 
         protected void onPostExecute(String strJson) {
             super.onPostExecute(strJson);
-
+            ArrayList<busInfo> tmp_arr = new ArrayList<>();
+            for(int i=0;i<jsonArray.length();i++) {
+                try {
+                    JSONObject jObj = jsonArray.getJSONObject(i);
+                    String extime_min = jObj.getString("EXTIME_MIN");
+                    String busNum = jObj.getString("ROUTE_NO");
+                    String status_pos = jObj.getString("STATUS_POS");
+                    busInfo tmp_item = new busInfo(extime_min, busNum, status_pos);
+                    tmp_arr.add(tmp_item);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            list = tmp_arr;
+            recyclerView.setHasFixedSize(true);
+            adapter = new MainViewAdapter(busArrival.this,list);
+            recyclerView.setLayoutManager(new LinearLayoutManager(busArrival.this));
+            recyclerView.setAdapter(adapter);
         }
     }
 }
