@@ -118,14 +118,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapview.setTrackingMode(true);
         tmapview.setSightVisible(true);
 
-        // 풍선에서 우측 버튼 클릭시 할 행동입니다
-        tmapview.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback()
-        {
+        // 풍선뷰 클릭시 할 행동입니다
+        tmapview.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback() {
             @Override
             public void onCalloutRightButton(TMapMarkerItem markerItem) {
-                Toast.makeText(MainActivity.this, "클릭", Toast.LENGTH_SHORT).show();
+
             }
         });
+
 
         //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
     //    tMapView.setIcon();
@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                     if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
                                     else tMapPointStart = new TMapPoint(cur_lati, cur_long);
                                     TMapPoint tMapPointEnd = new TMapPoint(dest_lati, dest_long); // N서울타워(목적지)
-                                    TMapData tmapdata = new TMapData();
                                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
                                         @Override
                                         public void onFindPathData(TMapPolyLine tMapPolyLine) {
