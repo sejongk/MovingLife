@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
     private TMapGpsManager tmapgps = null;
     private TMapView tmapview = null;
-
+    TMapData tmapdata = new TMapData();
     double cur_lati=0;
     double cur_long=0;
 
@@ -165,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                     if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
                                     else tMapPointStart = new TMapPoint(cur_lati, cur_long);
                                     TMapPoint tMapPointEnd = new TMapPoint(tMapPoint.getLatitude(), tMapPoint.getLongitude()); // N서울타워(목적지)
-                                    TMapData tmapdata = new TMapData();
                                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
                                         @Override
                                         public void onFindPathData(TMapPolyLine tMapPolyLine) {
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                     tmapview.removeAllMarkerItem();
                                     TMapPoint tMapPointStart = new TMapPoint(dep_lati, dep_long);
                                     TMapPoint tMapPointEnd = new TMapPoint(dest_lati, dest_long);
-                                    TMapData tmapdata = new TMapData();
+
                                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
                                         @Override
                                         public void onFindPathData(TMapPolyLine tMapPolyLine) {
@@ -260,6 +260,38 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 }
             }
         });
+        Button search = (Button)findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText edittext = new EditText(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("장소 검색");
+                builder.setView(edittext);
+                builder.setPositiveButton("검색",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                final String strObj = edittext.getText().toString(); //검색어
+                                tmapdata.findAllPOI(strObj, new TMapData.FindAllPOIListenerCallback() {
+                                    @Override
+                                    public void onFindAllPOI(ArrayList poiItem) {
+                                        for(int i = 0; i < poiItem.size(); i++) {
+                                            TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
+                                            markPOIPoint(item.getPOIPoint(), item.getPOIName());
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                builder.setNegativeButton("취소",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+                builder.show();
+            }
+        });
 
     }
     public void showMarkerPoint(TMapPoint point) {// 마커 찍는거 빨간색 포인트.
@@ -276,19 +308,24 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapview.setCenterPoint( point.getLongitude(), point.getLatitude() );
     }
 
-    public void showPOIPoints() {// 마커 찍는거 빨간색 포인트.
-        TMapData tmapdata = new TMapData();
-        tmapdata.findAllPOI("정거장", new TMapData.FindAllPOIListenerCallback() {
+    public void markPOIPoint(TMapPoint point,String name) {// 마커 찍는거 빨간색 포인트.
+        final TMapMarkerItem markerItem1 = new TMapMarkerItem();
+        TMapPoint tMapPoint1 = point; // SKT타워
+        markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
+        markerItem1.setTMapPoint( tMapPoint1 ); // 마커의 좌표 지정
+        markerItem1.setName(name); // 마커의 타이틀 지정
+        markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부
+        markerItem1.setCalloutTitle(name);
+        TMapPoint tMapPointStart;
+        if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
+        else tMapPointStart = new TMapPoint(cur_lati, cur_long);
+        tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPoint1, new TMapData.FindPathDataListenerCallback() {
             @Override
-            public void onFindAllPOI(ArrayList poiItem) {
-                for(int i = 0; i < poiItem.size(); i++) {
-                    TMapPOIItem  item = (TMapPOIItem) poiItem.get(i);
-                    Log.d("POI Name: ", item.getPOIName().toString() + ", " +
-                            "Address: " + item.getPOIAddress().replace("null", "")  + ", " +
-                            "Point: " + item.getPOIPoint().toString());
-                }
+            public void onFindPathData(TMapPolyLine tMapPolyLine) {
+                markerItem1.setCalloutSubTitle("소요시간은 "+ new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
             }
         });
+        tmapview.addMarkerItem(name + point.toString(), markerItem1); // 지도에 마커 추가
     }
 
     public void createAlarm(String message, int hour, int minutes) {
