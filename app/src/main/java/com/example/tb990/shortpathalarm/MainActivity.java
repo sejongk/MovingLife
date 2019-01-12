@@ -122,7 +122,84 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapview.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback() {
             @Override
             public void onCalloutRightButton(TMapMarkerItem markerItem) {
+                final TMapPoint tMapPoint = markerItem.getTMapPoint();
+                if(setting) {
+                    AlertDialog.Builder oDialog = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog);
+                    oDialog.setMessage("도착지로 설정하시겠습니까?")
+                            .setTitle("도착지 설정")
+                            .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.i("Dialog", "취소");
+                                    Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
+                                }
+                            })
+                            .setNeutralButton("예", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dest_lati = tMapPoint.getLatitude();
+                                    dest_long = tMapPoint.getLongitude();
+                                    Toast.makeText(getApplicationContext(), "도착지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude() + "로 설정되었습니다.", Toast.LENGTH_LONG).show();
+                                    tmapview.removeAllMarkerItem();
+                                    TMapPoint tMapPointStart;
+                                    if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
+                                    else tMapPointStart = new TMapPoint(cur_lati, cur_long);
+                                    TMapPoint tMapPointEnd = new TMapPoint(dest_lati, dest_long); // N서울타워(목적지)
+                                    tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
+                                        @Override
+                                        public void onFindPathData(TMapPolyLine tMapPolyLine) {
+                                            tMapPolyLine.setLineColor(Color.BLUE);
+                                            tMapPolyLine.setLineWidth(2);
+                                            tMapView.addTMapPolyLine("Line1", tMapPolyLine);
+                                            distance = tMapPolyLine.getDistance();
+                                            Log.d("도착지 설정거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+                                            showMarkerPoint(tMapPoint);
+                                        }
+                                    });
+                                }
+                            })
+                            .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
+                            .show();
+                }
+                else{
+                    AlertDialog.Builder oDialog = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog);
+                    oDialog.setMessage("출발지 설정하시겠습니까?")
+                            .setTitle("출발지 설정")
+                            .setPositiveButton("아니오", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    Log.i("Dialog", "취소");
+                                    Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
+                                }
+                            })
+                            .setNeutralButton("예", new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dep_lati = tMapPoint.getLatitude(); dep_long = tMapPoint.getLongitude();
+                                    Toast.makeText(getApplicationContext(), "출발지가 lon=" + tMapPoint.getLongitude() + "\nlat=" + tMapPoint.getLatitude()+"로 설정되었습니다.", Toast.LENGTH_LONG).show();
+                                    tmapview.removeAllMarkerItem();
+                                    TMapPoint tMapPointStart = new TMapPoint(dep_lati, dep_long);
+                                    TMapPoint tMapPointEnd = new TMapPoint(dest_lati, dest_long);
 
+                                    tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
+                                        @Override
+                                        public void onFindPathData(TMapPolyLine tMapPolyLine) {
+                                            tMapPolyLine.setLineColor(Color.BLUE);
+                                            tMapPolyLine.setLineWidth(2);
+                                            tMapView.addTMapPolyLine("Line1", tMapPolyLine);
+                                            distance = tMapPolyLine.getDistance();
+                                            Log.d("출발지 설정거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
+                                            showMarkerPoint(tMapPoint);
+
+                                        }
+                                    });
+                                }
+                            })
+                            .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
+                            .show();
+                }
             }
         });
 
