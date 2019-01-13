@@ -347,12 +347,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         break;
 
                     case R.id.setStart:
-                        setting=true;
+                        setting=false;
                         Toast.makeText(MainActivity.this,"출발지 설정 모드입니다.",Toast.LENGTH_LONG).show();
                         break;
 
                     case R.id.setEnd:
-                        setting=false;
+                        setting=true;
                         Toast.makeText(MainActivity.this,"도착지 설정 모드입니다.",Toast.LENGTH_LONG).show();
                         break;
 
