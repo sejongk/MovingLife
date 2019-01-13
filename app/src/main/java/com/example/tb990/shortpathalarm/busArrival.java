@@ -91,6 +91,8 @@ public class busArrival extends AppCompatActivity {
             final int itemposition = position;
             holder.busNumText.setText(list.get(itemposition).busNum);
             holder.extimeText.setText(list.get(itemposition).extime_min);
+            holder.walkexpTime.setText(Integer.toString(dep_bus_time));
+            holder.posText.setText(list.get(itemposition).status_pos);
             holder.busNumText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -135,10 +137,14 @@ public class busArrival extends AppCompatActivity {
             public TextView extimeText;
             public TextView busNumText;
             public TextView posText;
+            public TextView walkexpTime;
+
             public Holder(View view){
                 super(view);
                 busNumText = (TextView) view.findViewById(R.id.busNumText);
                 extimeText = (TextView) view.findViewById(R.id.leftTime);
+                posText = (TextView) view.findViewById(R.id.leftStop);
+                walkexpTime = (TextView) view.findViewById(R.id.expTime);
             }
         }
 
