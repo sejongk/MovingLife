@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.AlarmClock;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -150,11 +153,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                     String markerid = marker.getID();
                     if(markerid.substring(0,3).equals("bus")){
                         final String id = markerid.substring(3);
-                    final TMapPoint markerPoint = marker.getTMapPoint();
-                    TMapPoint bus_start;
+                        final TMapPoint markerPoint = marker.getTMapPoint();
+                        TMapPoint bus_start;
                         if(dep_lati>0)  bus_start = new TMapPoint(dep_lati, dep_long);
-                    else bus_start = new TMapPoint(cur_lati, cur_long);
-                    tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, bus_start, markerPoint, new TMapData.FindPathDataListenerCallback() {
+                        else bus_start = new TMapPoint(cur_lati, cur_long);
+                        tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, bus_start, markerPoint, new TMapData.FindPathDataListenerCallback() {
                         @Override
                         public void onFindPathData(TMapPolyLine tMapPolyLine) {
                             Intent intent = new Intent(MainActivity.this, busArrival.class);
@@ -259,14 +262,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-/* 수정 LinearLayout remainLayout = (LinearLayout)findViewById(R.id.remain_part);
+        LinearLayout remainLayout = (LinearLayout)findViewById(R.id.remain_part);
         remainLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 changeView();
             }
         });
-*/
+
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -540,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         return super.onOptionsItemSelected(item);
     }
     private void changeView() {
-        LinearLayout view1 = (LinearLayout) findViewById(R.id.linearLayoutTmap) ;
+        //LinearLayout view1 = (LinearLayout) findViewById(R.id.linearLayoutTmap) ;
         DrawerLayout view2 = (DrawerLayout) findViewById(R.id.drawer_layout) ;
         switch (viewNumber) {
             case 0 :
