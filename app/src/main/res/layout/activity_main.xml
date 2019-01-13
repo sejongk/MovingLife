@@ -5,46 +5,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
-    <LinearLayout
-        android:id="@+id/linearLayoutTmap"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="150dp">
-
-        <Button
-            android:id="@+id/setAlarm"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/linearLayoutTmap"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="알람 설정" />
-
-        <Button
-            android:id="@+id/setPoint"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+        </LinearLayout>
+        <android.support.v4.widget.DrawerLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="출발지 설정" />
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
 
-        <Button
-            android:id="@+id/search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="검색" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        <Button
-            android:id="@+id/getBus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="주변 버스 정류장" />
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/remain_part"/>
+            </LinearLayout>
 
-        <Button
-            android:id="@+id/busTest"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="버스 테스트" />
-    </LinearLayout>
+            <android.support.design.widget.NavigationView
+                android:id="@+id/navigation_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                app:headerLayout="@layout/drawer_header"
+                app:menu="@menu/drawer"/>
 
-
-
+        </android.support.v4.widget.DrawerLayout>
+    </FrameLayout>
 </android.support.constraint.ConstraintLayout>
