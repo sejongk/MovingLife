@@ -98,8 +98,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mContext = this;
-        final Button setPoint = (Button)findViewById(R.id.setPoint);
 
         try {
             double loadVelo = Double.valueOf(load().toString());
@@ -233,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 }
             }
         });
+
         Button setAlarm = (Button)findViewById(R.id.setAlarm);
         setAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
             }
         });
+        final Button setPoint = (Button)findViewById(R.id.setPoint);
         setPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
