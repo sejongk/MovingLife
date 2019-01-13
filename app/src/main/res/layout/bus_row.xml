@@ -29,7 +29,7 @@
         android:textSize="30dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:id="@+id/leftTime"/>
+        android:id="@+id/expTime"/>
 
 
     <View
