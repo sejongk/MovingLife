@@ -141,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
-                changeView();
                 return false;
             }
             @Override
