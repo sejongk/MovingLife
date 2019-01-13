@@ -147,7 +147,27 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             }
             @Override
             public boolean onPressUpEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
-                return false;
+                for(int i=0;i<arrayList.size();i++){
+                    TMapMarkerItem marker = (TMapMarkerItem)arrayList.get(i);
+                    String markerid = marker.getID();
+                    if(markerid.substring(0,2).equals("bus")){
+                        final String id = markerid.substring(3);
+                    final TMapPoint markerPoint = marker.getTMapPoint();
+                    TMapPoint bus_start;
+                    if(dep_lati>0)  bus_start = new TMapPoint(dep_lati, dep_long);
+                    else bus_start = new TMapPoint(cur_lati, cur_long);
+                    tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, bus_start, markerPoint, new TMapData.FindPathDataListenerCallback() {
+                        @Override
+                        public void onFindPathData(TMapPolyLine tMapPolyLine) {
+                            Intent intent = new Intent(MainActivity.this, busArrival.class);
+                            intent.putExtra("id",id);
+                            intent.putExtra("time",(tMapPolyLine.getDistance() / velocity));
+                            startActivity(intent);
+                        }
+                    });
+                    }
+                }
+                return true;
             }
         });
 
@@ -471,10 +491,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                     TMapPoint tMapPoint1 = new TMapPoint(point.getLatitude(), point.getLongitude()); // SKT타워
                     markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
                     markerItem1.setTMapPoint(tMapPoint1); // 마커의 좌표 지정
-                    markerItem1.setName(obj.getString("name")); // 마커의
-
-
-                    // 타이틀 지정
+                    markerItem1.setName(obj.getString("name")); // 마커의// 타이틀 지정
                     markerItem1.setCalloutTitle(obj.getString("name"));
                     markerItem1.setCalloutSubTitle("버스 정류장");
                     markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부

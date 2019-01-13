@@ -38,12 +38,17 @@ public class busArrival extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MainViewAdapter adapter;
     ArrayList<busInfo> list = new ArrayList<>();
+
+    Intent intent = getIntent();
+    double dep_bus_time;
+    String id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus_arrival);
-
-        getBuslist getBus = new getBuslist("8002940");
+        id = intent.getStringExtra("id");
+        dep_bus_time = intent.getDoubleExtra("time",0);
+        getBuslist getBus = new getBuslist(id);
         getBus.execute();
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
