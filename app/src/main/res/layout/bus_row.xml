@@ -24,6 +24,12 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:id="@+id/leftStop"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/leftTime"/>
 
 
     <View
