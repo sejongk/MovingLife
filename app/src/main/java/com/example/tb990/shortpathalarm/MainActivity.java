@@ -150,11 +150,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 for(int i=0;i<arrayList.size();i++){
                     TMapMarkerItem marker = (TMapMarkerItem)arrayList.get(i);
                     String markerid = marker.getID();
-                    if(markerid.substring(0,2).equals("bus")){
+                    if(markerid.substring(0,3).equals("bus")){
                         final String id = markerid.substring(3);
                     final TMapPoint markerPoint = marker.getTMapPoint();
                     TMapPoint bus_start;
-                    if(dep_lati>0)  bus_start = new TMapPoint(dep_lati, dep_long);
+                        if(dep_lati>0)  bus_start = new TMapPoint(dep_lati, dep_long);
                     else bus_start = new TMapPoint(cur_lati, cur_long);
                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, bus_start, markerPoint, new TMapData.FindPathDataListenerCallback() {
                         @Override
@@ -389,14 +389,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     }
 
     public void createAlarm(String message, int hour, int minutes) {
-        ArrayList<Integer> days = new ArrayList<Integer>();
-        days.addAll(Arrays.asList(Calendar.MONDAY, Calendar.TUESDAY,
-                Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY));
+      //  ArrayList<Integer> days = new ArrayList<Integer>();
+        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+     //   days.addAll(Arrays.asList(Calendar.SUNDAY,Calendar.MONDAY, Calendar.TUESDAY,Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY,Calendar.SATURDAY));
         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_MESSAGE, message) //알람 메세지
                 .putExtra(AlarmClock.EXTRA_HOUR, hour) // 알람 HOUR : 24시 기준
                 .putExtra(AlarmClock.EXTRA_MINUTES, minutes) // 알람 MINUTE
-                .putExtra(AlarmClock.EXTRA_DAYS,days) // 1주일중 무슨요일에 올릴것인지.(반복시 설정하는것 )
+                .putExtra(AlarmClock.EXTRA_DAYS,day) // 1주일중 무슨요일에 올릴것인지.(반복시 설정하는것 )
                 .putExtra(AlarmClock.EXTRA_SKIP_UI, false); //창 전환 안함 FALSE면 알람앱으로 넘어가고, TRUE면 앱안 넘어감
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
