@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">shortPathAlarm</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">미구현</string>
+    <string name="setAlarm">알람설정</string>
+    <string name="search">장소검색</string>
+    <string name="nearBusStation">주변버스정류장</string>
+    <string name="busTest">버스 테스트</string>
+    <string name="setStartEnd">출발지/도착지 설정</string>
+    <string name="setStart">출발지 설정</string>
+    <string name="setEnd">도착지 설정</string>
+    <string name="drawer_header_text">구현한 기능</string>
 </resources>

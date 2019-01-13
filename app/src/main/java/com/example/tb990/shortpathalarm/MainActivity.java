@@ -5,22 +5,26 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
-import android.net.TrafficStats;
 import android.os.AsyncTask;
-import android.os.StrictMode;
 import android.provider.AlarmClock;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -35,10 +39,6 @@ import com.skt.Tmap.TMapView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -50,16 +50,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
     ArrayList<MapPoint> busStops = new ArrayList<>();
@@ -71,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     TMapData tmapdata = new TMapData();
     double cur_lati=0;
     double cur_long=0;
-
     boolean setting = true; // true 이면 도착지 설정, false 이면 출발지 설정
+    int viewNumber = 0;
     @Override
     public void onLocationChange(Location location){
         if (m_bTrackingMode) {
@@ -94,12 +89,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     int mHour=0;
     int mMinute=0;
 
+    //side slide
+    private DrawerLayout mDrawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mContext = this;
-        final Button setPoint = (Button)findViewById(R.id.setPoint);
 
         try {
             double loadVelo = Double.valueOf(load().toString());
@@ -111,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         }catch (Exception e){ }
 
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
-        final TMapView tMapView = new TMapView(this);
-        tmapview = tMapView;
+       final TMapView tMapView = new TMapView(this);
+       tmapview = tMapView;
        tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
-        linearLayoutTmap.addView( tMapView );
+       linearLayoutTmap.addView( tMapView );
 
         /* 현재 보는 방향 */
        tmapview.setCompassMode(true);
@@ -143,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
+                changeView();
                 return false;
             }
             @Override
@@ -253,95 +252,109 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 }
             }
         });
-        Button setAlarm = (Button)findViewById(R.id.setAlarm);
-        setAlarm.setOnClickListener(new View.OnClickListener() {
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+/* 수정 LinearLayout remainLayout = (LinearLayout)findViewById(R.id.remain_part);
+        remainLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Log.e("distance",Double.toString(distance));
-                Log.e("velocity",Double.toString(velocity));
-                double exp_time = distance / velocity;
-                Log.e("time",Double.toString(exp_time));
-
-                final int exp_hour = (int)exp_time / 60;
-                final int exp_minutes = (int) exp_time % 60;
-                TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        mHour = hourOfDay - exp_hour ;
-                        mMinute = minute - exp_minutes;
-                        createAlarm("지금 출발!",mHour,mMinute);
-                    }
-                };
-                new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
-
-
+                changeView();
             }
         });
-        setPoint.setOnClickListener(new View.OnClickListener() {
+*/
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                if(setting) {
-                    setPoint.setText("도착지 설정");
-                    setting = false;
-                }
-                else{
-                    setPoint.setText("출발지 설정");
-                    setting = true;
-                }
-            }
-        });
-        Button search = (Button)findViewById(R.id.search);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final EditText edittext = new EditText(MainActivity.this);
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("장소 검색");
-                builder.setView(edittext);
-                builder.setPositiveButton("검색",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                final String strObj = edittext.getText().toString(); //검색어
-                                tmapview.removeAllMarkerItem();
-                                tmapdata.findAllPOI(strObj, new TMapData.FindAllPOIListenerCallback() {
-                                    @Override
-                                    public void onFindAllPOI(ArrayList poiItem) {
-                                        for(int i = 0; i < poiItem.size(); i++) {
-                                            TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
-                                            markPOIPoint(item.getPOIPoint(), item.getPOIName());
-                                        }
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                mDrawerLayout.closeDrawers();
+
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.setAlarm: // 알람설정
+                        Log.e("distance",Double.toString(distance));
+                        Log.e("velocity",Double.toString(velocity));
+                        double exp_time = distance / velocity;
+                        Log.e("time",Double.toString(exp_time));
+
+                        final int exp_hour = (int)exp_time / 60;
+                        final int exp_minutes = (int) exp_time % 60;
+                        TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                mHour = hourOfDay - exp_hour ;
+                                mMinute = minute - exp_minutes;
+                                createAlarm("지금 출발!",mHour,mMinute);
+                            }
+                        };
+                        new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
+                        break;
+
+                    case R.id.search: // 검색
+                        final EditText edittext = new EditText(MainActivity.this);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("장소 검색");
+                        builder.setView(edittext);
+                        builder.setPositiveButton("검색",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String strObj = edittext.getText().toString(); //검색어
+                                        tmapview.removeAllMarkerItem();
+                                        tmapdata.findAllPOI(strObj, new TMapData.FindAllPOIListenerCallback() {
+                                            @Override
+                                            public void onFindAllPOI(ArrayList poiItem) {
+                                                for(int i = 0; i < poiItem.size(); i++) {
+                                                    TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
+                                                    markPOIPoint(item.getPOIPoint(), item.getPOIName());
+                                                }
+                                            }
+                                        });
                                     }
                                 });
-                            }
-                        });
-                builder.setNegativeButton("취소",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+                        builder.setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        });
-                builder.show();
-            }
-        });
-        Button getBus = (Button)findViewById(R.id.getBus);
-        getBus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               JSONObject sObj = new JSONObject();
-               try {
-                   sObj.accumulate("latitude", cur_lati);
-                   sObj.accumulate("longitude", cur_long);
-                   getStops gs = new getStops(sObj);
-                   gs.execute();
-               }catch (JSONException e){e.printStackTrace();}
-            }
-        });
-        Button busTest = (Button)findViewById(R.id.busTest);
-        busTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               Intent intent = new Intent(MainActivity.this, busArrival.class);
-               startActivity(intent);
+                                    }
+                                });
+                        builder.show();
+                        break;
+
+                    case R.id.nearBusStation: // 주변버스정류장
+                        JSONObject sObj = new JSONObject();
+                        try {
+                            sObj.accumulate("latitude", cur_lati);
+                            sObj.accumulate("longitude", cur_long);
+                            getStops gs = new getStops(sObj);
+                            gs.execute();
+                        }catch (JSONException e){e.printStackTrace();}
+                        break;
+
+                    case R.id.busTest : //버스테스트
+                        Intent intent = new Intent(MainActivity.this, busArrival.class);
+                        startActivity(intent);
+                        break;
+
+                    case R.id.setStart:
+                        setting=true;
+                        Toast.makeText(MainActivity.this,"출발지 설정 모드입니다.",Toast.LENGTH_LONG).show();
+                        break;
+
+                    case R.id.setEnd:
+                        setting=false;
+                        Toast.makeText(MainActivity.this,"도착지 설정 모드입니다.",Toast.LENGTH_LONG).show();
+                        break;
+
+                }
+                return true;
             }
         });
     }
@@ -503,5 +516,42 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             }
         }
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.action_settings:
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    private void changeView() {
+        LinearLayout view1 = (LinearLayout) findViewById(R.id.linearLayoutTmap) ;
+        DrawerLayout view2 = (DrawerLayout) findViewById(R.id.drawer_layout) ;
+        switch (viewNumber) {
+            case 0 :
+                view2.setVisibility(View.VISIBLE) ;
+                viewNumber=1;
+                break ;
+            case 1 :
+                view2.setVisibility(View.INVISIBLE) ;
+                viewNumber=0;
+                break ;
+        }
     }
 }
