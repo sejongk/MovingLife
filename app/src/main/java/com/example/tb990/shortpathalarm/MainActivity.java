@@ -291,7 +291,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                 mHour = hourOfDay - exp_hour ;
                                 mMinute = minute - exp_minutes;
-                                createAlarm("지금 출발!",mHour,mMinute);
+                                if(mMinute < 0){
+                                    mHour--;
+                                    mMinute = 60+mMinute;
+                                }
+                                createAlarm("약속시간 지키기",mHour,mMinute);
                             }
                         };
                         new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
@@ -401,14 +405,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     }
 
     public void createAlarm(String message, int hour, int minutes) {
-      //  ArrayList<Integer> days = new ArrayList<Integer>();
-        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-     //   days.addAll(Arrays.asList(Calendar.SUNDAY,Calendar.MONDAY, Calendar.TUESDAY,Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY,Calendar.SATURDAY));
+        ArrayList<Integer> days = new ArrayList<Integer>();
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        days.addAll(Arrays.asList(day));
         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_MESSAGE, message) //알람 메세지
                 .putExtra(AlarmClock.EXTRA_HOUR, hour) // 알람 HOUR : 24시 기준
                 .putExtra(AlarmClock.EXTRA_MINUTES, minutes) // 알람 MINUTE
-                .putExtra(AlarmClock.EXTRA_DAYS,day) // 1주일중 무슨요일에 올릴것인지.(반복시 설정하는것 )
+                .putExtra(AlarmClock.EXTRA_DAYS,days) // 1주일중 무슨요일에 올릴것인지.(반복시 설정하는것 )
                 .putExtra(AlarmClock.EXTRA_SKIP_UI, false); //창 전환 안함 FALSE면 알람앱으로 넘어가고, TRUE면 앱안 넘어감
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
