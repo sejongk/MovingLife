@@ -1,43 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:gravity="center"
-    android:layout_height="60dp"
+    android:layout_height="90dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="5dp"
+    app:cardCornerRadius="5dp"
+    android:layout_marginBottom="1dp"
+    android:layout_margin="2dp"
     >
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:textSize="30dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:id="@+id/busNumText"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:textSize="30dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:id="@+id/leftTime"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:textSize="30dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:id="@+id/leftStop"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:textSize="30dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:id="@+id/expTime"/>
-
-
-    <View
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
-        android:layout_centerInParent="true"
-        android:background="#e3e3e3"/>
+        android:layout_height="match_parent"
+        android:layout_margin="10.5dp"
+        >
+        <ImageView
+            android:id="@+id/busIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_directions_bus_black_24dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:textSize="22sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/busNumText"
+            android:layout_marginLeft="7dp"
+            android:layout_toRightOf="@id/busIcon"
+            android:layout_alignBaseline="@id/busIcon"
+            tools:text="307"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/leftTime"
+            android:layout_below="@id/expTime"
+            android:textColor="#C62828"
+            tools:text="3"/>
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/leftTimeBack"
+            android:layout_below="@id/expTime"
+            android:textColor="#C62828"
+            android:text="분 ("
+            android:layout_toRightOf="@id/leftTime"
+            />
+
+        <TextView
+            android:id="@+id/leftStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/leftTimeBack"
+            android:layout_alignBaseline="@id/leftTime"
+            android:textColor="#C62828"
+            tools:text="7"/>
+
+        <TextView
+            android:id="@+id/leftStopBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/leftStop"
+            android:layout_alignBaseline="@id/leftTime"
+            android:textColor="#C62828"
+            android:text="정거장)"/>
+
+        <TextView
+            android:id="@+id/expTimeFront"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/busIcon"
+            android:text="정류장까지 도보로 " />
+
+        <TextView
+            android:id="@+id/expTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/busIcon"
+            android:layout_toRightOf="@id/expTimeFront"
+            tools:text="7" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/busIcon"
+            android:layout_toRightOf="@id/expTime"
+            android:text="분" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
