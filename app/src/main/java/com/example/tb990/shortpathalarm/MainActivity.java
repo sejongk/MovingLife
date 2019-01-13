@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
        linearLayoutTmap.addView( tMapView );
 
         /* 현재 보는 방향 */
-       tmapview.setCompassMode(true);
+    //   tmapview.setCompassMode(true);
         /* 현위치 아이콘표시 */
         tmapview.setIconVisibility(true);
         /* 줌레벨 */
@@ -141,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
-                changeView();
                 return false;
             }
             @Override
