@@ -1,6 +1,7 @@
 package com.example.tb990.shortpathalarm;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -171,6 +173,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         }
                     });
                     }
+                    if(markerid.substring(0,3).equals("POI")) {
+                        Dialog dialog = new Dialog(MainActivity.this);
+                        dialog.setContentView(R.layout.custom_dialog);
+                        dialog.setTitle("장소 상세정보");
+                        TextView tv = (TextView) dialog.findViewById(R.id.text);
+                        String content = marker.getCalloutSubTitle();
+                        tv.setText(content);
+                        dialog.show();
+                    }
                 }
                 return true;
             }
@@ -298,7 +309,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                 mHour = hourOfDay - exp_hour ;
                                 mMinute = minute - exp_minutes;
-                                createAlarm("지금 출발!",mHour,mMinute);
+                                if(mMinute < 0){
+                                    mHour--;
+                                    mMinute = 60+mMinute;
+                                }
+                                createAlarm("약속시간 지키기",mHour,mMinute);
                             }
                         };
                         new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
@@ -319,7 +334,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                             public void onFindAllPOI(ArrayList poiItem) {
                                                 for(int i = 0; i < poiItem.size(); i++) {
                                                     TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
-                                                    markPOIPoint(item.getPOIPoint(), item.getPOIName());
+                                                    String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n";
+                                                            if(item.desc != null) subtitle += item.desc+"\n";
+                                                            if(item.telNo != null) subtitle += "전화번호는 "+item.telNo+"입니다.";
+                                                    markPOIPoint(item.getPOIPoint(), item.getPOIName(),subtitle);
                                                 }
                                             }
                                         });
@@ -350,12 +368,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         break;
 
                     case R.id.setStart:
-                        setting=true;
+                        setting=false;
                         Toast.makeText(MainActivity.this,"출발지 설정 모드입니다.",Toast.LENGTH_LONG).show();
                         break;
 
                     case R.id.setEnd:
-                        setting=false;
+                        setting=true;
                         Toast.makeText(MainActivity.this,"도착지 설정 모드입니다.",Toast.LENGTH_LONG).show();
                         break;
 
@@ -384,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapview.setCenterPoint( point.getLongitude(), point.getLatitude() );
     }
 
-    public void markPOIPoint(TMapPoint point,String name) {// 마커 찍는거 빨간색 포인트.
+    public void markPOIPoint(TMapPoint point,String name,String subtitle) {// 마커 찍는거 빨간색 포인트.
         final TMapMarkerItem markerItem1 = new TMapMarkerItem();
         TMapPoint tMapPoint1 = point; // SKT타워
         markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
@@ -392,30 +410,20 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         markerItem1.setName(name); // 마커의 타이틀 지정
         markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부
         markerItem1.setCalloutTitle(name);
-        TMapPoint tMapPointStart;
-        if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
-        else tMapPointStart = new TMapPoint(cur_lati, cur_long);
-        markerItem1.setCalloutSubTitle("검색 결과");
-        /*
-        tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPoint1, new TMapData.FindPathDataListenerCallback() {
-            @Override
-            public void onFindPathData(TMapPolyLine tMapPolyLine) {
-
-            }
-        });
-        */
-        tmapview.addMarkerItem(name + point.toString(), markerItem1); // 지도에 마커 추가
+        markerItem1.setCalloutSubTitle(subtitle);
+        tmapview.addMarkerItem("POI" + point.toString(), markerItem1); // 지도에 마커 추가
     }
 
     public void createAlarm(String message, int hour, int minutes) {
-      //  ArrayList<Integer> days = new ArrayList<Integer>();
-        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-     //   days.addAll(Arrays.asList(Calendar.SUNDAY,Calendar.MONDAY, Calendar.TUESDAY,Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY,Calendar.SATURDAY));
+        ArrayList<Integer> days = new ArrayList<Integer>();
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        days.addAll(Arrays.asList(day));
         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_MESSAGE, message) //알람 메세지
                 .putExtra(AlarmClock.EXTRA_HOUR, hour) // 알람 HOUR : 24시 기준
                 .putExtra(AlarmClock.EXTRA_MINUTES, minutes) // 알람 MINUTE
-                .putExtra(AlarmClock.EXTRA_DAYS,day) // 1주일중 무슨요일에 올릴것인지.(반복시 설정하는것 )
+                .putExtra(AlarmClock.EXTRA_DAYS,days) // 1주일중 무슨요일에 올릴것인지.(반복시 설정하는것 )
                 .putExtra(AlarmClock.EXTRA_SKIP_UI, false); //창 전환 안함 FALSE면 알람앱으로 넘어가고, TRUE면 앱안 넘어감
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
