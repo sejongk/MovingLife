@@ -39,12 +39,15 @@ import java.util.List;
 
 public class busAlarm extends AppCompatActivity {
     ODsayService odsayService;
-    String SX ="127.363709";
-    String SY ="36.372896";
-    String EX = "127.449876";
-    String EY = "36.341166";
+    Intent intent;
+    String SX;
+    String SY;
+    String EX;
+    String EY;
     String tmp_EndX;
     String tmp_EndY;
+
+
 
     ArrayList<PathItem> dataList = new ArrayList<PathItem>();
     private static CustomAdapter adapter;
@@ -86,6 +89,11 @@ public class busAlarm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus_alarm);
+        intent = getIntent();
+        SX =intent.getStringExtra("SX");
+        SY =intent.getStringExtra("SY");
+        EX =intent.getStringExtra("EX");
+        EY =intent.getStringExtra("EY");
         listView=(ListView)findViewById(R.id.listViewExample);
 
         // 싱글톤 생성, Key 값을 활용하여 객체 생성
@@ -153,13 +161,13 @@ public class busAlarm extends AppCompatActivity {
                             dataList.add(new PathItem(trafficType, distance, sectionTime, "도보로 이동", SX, SY,nextObj.getString("x"), nextObj.getString("y")));
                         }
                         else if(i == (subPath.length()-1)){
-                            JSONObject prevObj = subPath.getJSONObject(1).getJSONObject("passStopList").getJSONArray("stations").getJSONObject(subPath.length()-2);
-                            dataList.add(new PathItem(trafficType, distance, sectionTime, "도보로 이동", prevObj.getString("x"), prevObj.getString("y"),EX,EY));
+                            JSONObject prevObj = subPath.getJSONObject(subPath.length()-2);
+                            dataList.add(new PathItem(trafficType, distance, sectionTime, "도보로 이동", prevObj.getString("endX"), prevObj.getString("endY"),EX,EY));
                         }
                         else{
-                            JSONObject prevObj = subPath.getJSONObject(1).getJSONObject("passStopList").getJSONArray("stations").getJSONObject(i-1);
-                            JSONObject nextObj = subPath.getJSONObject(1).getJSONObject("passStopList").getJSONArray("stations").getJSONObject(i+1);
-                            dataList.add(new PathItem(trafficType, distance, sectionTime, "도보로 이동", prevObj.getString("x"), prevObj.getString("y"),nextObj.getString("x"),nextObj.getString("y")));
+                            JSONObject prevObj = subPath.getJSONObject(i-1);
+                            JSONObject nextObj = subPath.getJSONObject(i+1);
+                            dataList.add(new PathItem(trafficType, distance, sectionTime, "도보로 이동", prevObj.getString("endX"), prevObj.getString("endY"),nextObj.getString("startX"),nextObj.getString("startY")));
                         }
 
                         }

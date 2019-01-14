@@ -41,9 +41,9 @@ public class walkMap extends AppCompatActivity {
         tmapview.setSightVisible(true);
 
         TMapData tmapdata = new TMapData();
-        final TMapPoint tMapPointStart = new TMapPoint(startX, startY);
-        final TMapPoint tMapPointEnd = new TMapPoint(endX, endY);
-        /*
+        final TMapPoint tMapPointStart = new TMapPoint(startY, startX);
+        final TMapPoint tMapPointEnd = new TMapPoint(endY, endX);
+
         tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
             @Override
             public void onFindPathData(TMapPolyLine tMapPolyLine) {
@@ -52,7 +52,7 @@ public class walkMap extends AppCompatActivity {
                 tmapview.addTMapPolyLine("Line1", tMapPolyLine);
             }
         });
-*/
+
 
         for(int i=0;i<2;i++){
             TMapMarkerItem markerItem1 = new TMapMarkerItem();
