@@ -5,6 +5,9 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
@@ -17,6 +20,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +55,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
 
         mContext = this;
 
@@ -338,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         break;
 
                     case R.id.busTest : //버스테스트
-                        Intent intent = new Intent(MainActivity.this, busArrival.class);
+                        Intent intent = new Intent(MainActivity.this, busAlarm.class);
                         startActivity(intent);
                         break;
 
@@ -551,6 +558,20 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 view2.setVisibility(View.INVISIBLE) ;
                 viewNumber=0;
                 break ;
+        }
+    }
+    private void printKeyHash() {
+        try{
+            PackageInfo info = getPackageManager().getPackageInfo("com.example.tb990.shortpathalarm", PackageManager.GET_SIGNATURES);
+            for(Signature signature:info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("keyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch(PackageManager.NameNotFoundException e){
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
     }
 }
