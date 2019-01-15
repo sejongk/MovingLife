@@ -1,10 +1,16 @@
 package com.example.tb990.shortpathalarm;
 
+import java.nio.file.Path;
+
 public class PathItem {
     int path_type=0;  //3 도보 2 버스 start 5 버스 end 4 버스 정류장
     int path_distance=0;
     int path_sectionTime=0;
     String name="default";
+
+    String startName;
+    String endName;
+    int stationCount;
 
     String cordi_X;
     String cordi_Y;
@@ -40,5 +46,15 @@ public class PathItem {
         this.cordi_Y = cordi_Y;
         this.next_X = next_X;
         this.next_Y = next_Y;
+    }
+    //                        dataList.add(new PathItem(2,distance,sectionTime,busNo,startName,endName,stationCount));
+    PathItem(int type, int distance, int sectionTime, String busNo, String startName, String endName, int stationCount){
+        this.path_type = type;
+        this.path_distance = distance;
+        this.path_sectionTime = sectionTime;
+        this.name = busNo;
+        this.startName = startName;
+        this.endName = endName;
+        this.stationCount = stationCount;
     }
 }

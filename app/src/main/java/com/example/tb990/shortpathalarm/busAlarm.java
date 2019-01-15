@@ -20,6 +20,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -148,8 +149,7 @@ public class busAlarm extends AppCompatActivity {
                         String endName = subObj.getString("endName");
                         double endX = subObj.getDouble("endX");
                         double endY = subObj.getDouble("endY");
-                        dataList.add(new PathItem(2,distance,sectionTime,startName));
-                        dataList.add(new PathItem(5,distance,sectionTime,endName,Double.toString(endX),Double.toString(endY)));
+                        dataList.add(new PathItem(2,distance,sectionTime,busNo,startName,endName,stationCount));
                         //버스 정류장 추가
                         for(int j=1;j<=stationCount;j++){
                             JSONObject station = stations.getJSONObject(j-1);
@@ -193,7 +193,7 @@ public class busAlarm extends AppCompatActivity {
                 Log.e(dataModel.name,"test: "+dataModel.next_Y);
                 startActivity(intent);
                 }
-                if(dataModel.path_type == 5) {
+                if(dataModel.path_type == 2) {
                    if(!alarmFlag) {
                        tmp_EndX = dataModel.cordi_X;
                        tmp_EndY = dataModel.cordi_Y;
@@ -224,9 +224,14 @@ public class busAlarm extends AppCompatActivity {
         // View lookup cache
         private class ViewHolder {
             TextView txtName;
-            TextView txtType;
-            TextView txtVersion;
-            ImageView info;
+            TextView startBusStop;
+            TextView endBusStop;
+            TextView numberBusStop;
+            TextView secTime;
+            TextView distance;
+            ImageView typeIcon;
+            LinearLayout optional;
+
         }
 
         public CustomAdapter(ArrayList<PathItem> data, Context context) {
@@ -255,11 +260,15 @@ public class busAlarm extends AppCompatActivity {
                 viewHolder = new ViewHolder();
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 convertView = inflater.inflate(R.layout.row_item, parent, false);
+                viewHolder.typeIcon = (ImageView) convertView.findViewById(R.id.typeIcon);
+                viewHolder.optional = (LinearLayout)convertView.findViewById(R.id.optionalItem);
+
                 viewHolder.txtName = (TextView) convertView.findViewById(R.id.itemname);
-                //viewHolder.txtType = (TextView) convertView.findViewById(R.id.itemtype);
-                viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.distance);
-         //       viewHolder.info = (ImageView) convertView.findViewById(R.id.sectime);
-                result=convertView;
+                viewHolder.distance = (TextView) convertView.findViewById(R.id.distance);
+                viewHolder.startBusStop = (TextView) convertView.findViewById(R.id.startBusStop);
+                viewHolder.endBusStop = (TextView) convertView.findViewById(R.id.endBusStop);
+                viewHolder.numberBusStop = (TextView) convertView.findViewById(R.id.numberBusStop);
+                viewHolder.secTime = (TextView) convertView.findViewById(R.id.sectime);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -268,11 +277,22 @@ public class busAlarm extends AppCompatActivity {
 
             lastPosition = position;
             viewHolder.txtName.setText(dataModel.name);
+            viewHolder.distance.setText(Integer.toString(dataModel.path_distance));
+            viewHolder.secTime.setText(Integer.toString(dataModel.path_sectionTime));
+            if(dataModel.path_type == 2){ //버스일때
+                viewHolder.typeIcon.setImageResource(R.drawable.ic_directions_bus_black_24dp);
+                viewHolder.startBusStop.setText(dataModel.startName);
+                viewHolder.endBusStop.setText(dataModel.endName);
+                viewHolder.numberBusStop.setText(Integer.toString(dataModel.stationCount));
+                viewHolder.optional.setVisibility(View.VISIBLE);
+            }
+            if(dataModel.path_type == 3){ //도보일때
+                viewHolder.typeIcon.setImageResource(R.drawable.ic_directions_walk_black_24dp);
+                viewHolder.optional.setVisibility(View.GONE);
+            }
             //viewHolder.txtType.setText(Integer.toString(dataModel.path_type));
-            viewHolder.txtVersion.setText(Integer.toString(dataModel.path_distance));
 //            viewHolder.info.setOnClickListener(this);
    //         viewHolder.info.setTag(position);
-            // Return the completed view to render on screen
             return convertView;
         }
     }
