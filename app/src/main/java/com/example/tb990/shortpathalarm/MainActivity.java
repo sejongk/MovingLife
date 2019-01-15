@@ -159,15 +159,19 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     //    tMapView.setIcon();
         //void setTMapPathIcon(Bitmap start, Bitmap end)
         tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
+            float start_x = 0;
+            float start_y = 0;
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
+                start_x = pointF.x;
+                start_y = pointF.y;
                 viewNumber += 1;
                 return false;
             }
             @Override
             public boolean onPressUpEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
                 if(arrayList.size() >0) {
-                    viewNumber+=-1;
+                    viewNumber += -1;
                     TMapMarkerItem marker = (TMapMarkerItem) arrayList.get(0);
                     String markerid = marker.getID();
                     if (markerid.substring(0, 3).equals("bus")) {
@@ -185,7 +189,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                 startActivity(intent);
                             }
                         });
-                    } if (markerid.substring(0, 3).equals("POI")) {
+                    }
+                    if (markerid.substring(0, 3).equals("POI")) {
                         Dialog dialog = new Dialog(MainActivity.this);
                         dialog.setContentView(R.layout.custom_dialog);
                         dialog.setTitle("장소 상세정보");
@@ -195,23 +200,28 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         TextView placeNumber = (TextView) dialog.findViewById(R.id.phoneNumber);
                         TextView placeDescription = (TextView) dialog.findViewById(R.id.placeDescription);
                         String content = marker.getCalloutSubTitle();
-                        StringTokenizer tokenizer = new StringTokenizer(content,"\n");
+                        StringTokenizer tokenizer = new StringTokenizer(content, "\n");
                         placeName.setText(tokenizer.nextToken());
                         placeAddress.setText(tokenizer.nextToken());
                         placeType.setText(tokenizer.nextToken());
                         String tem_num = tokenizer.nextToken();
                         String tem_desc = tokenizer.nextToken();
-                        if(tem_num != null) placeNumber.setText(tem_num);
-                        if(tem_desc != null) placeDescription.setText(tem_desc);
+                        if (tem_num != null) placeNumber.setText(tem_num);
+                        if (tem_desc != null) placeDescription.setText(tem_desc);
 
                         dialog.show();
 
                     }
-                }else{
-                    viewNumber += 1;
-                    changeView();
+                }else {
+                    float differenceX = Math.abs(start_x - pointF.x);
+                    float differenceY = Math.abs(start_y - pointF.y);
+                    if (differenceX > 5 || differenceY > 5) {
+                        viewNumber += -1;
+                    } else {
+                        viewNumber += 1;
+                        changeView();
+                    }
                 }
-
                 return true;
             }
         });
