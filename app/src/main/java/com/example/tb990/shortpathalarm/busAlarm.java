@@ -188,10 +188,6 @@ public class busAlarm extends AppCompatActivity {
                 intent.putExtra("startY",dataModel.cordi_Y);
                 intent.putExtra("nextX",dataModel.next_X);
                 intent.putExtra("nextY",dataModel.next_Y);
-                Log.e(dataModel.name,"test: "+dataModel.cordi_X);
-                Log.e(dataModel.name,"test: "+dataModel.cordi_Y);
-                Log.e(dataModel.name,"test: "+dataModel.next_X);
-                Log.e(dataModel.name,"test: "+dataModel.next_Y);
                 startActivity(intent);
                 }
                 if(dataModel.path_type == 2) {

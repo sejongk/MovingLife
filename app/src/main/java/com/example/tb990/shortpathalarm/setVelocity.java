@@ -1,12 +1,16 @@
 package com.example.tb990.shortpathalarm;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +42,28 @@ import java.util.ArrayList;
 public class setVelocity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback{
     DecimalFormat fmt = new DecimalFormat("0.#");
 
+    String locationProvider = LocationManager.NETWORK_PROVIDER;
+    LocationManager  lm;
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            tmapview.setLocationPoint( location.getLongitude(),location.getLatitude());
+            tmapview.setCenterPoint(location.getLongitude(), location.getLatitude());
+            tmapview.setTrackingMode(true);
+            tmapview.setSightVisible(true);
+
+        }
+        public void onProviderDisabled(String provider) {
+        }
+        public void onProviderEnabled(String provider) {
+        }
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+    };
+
+
+
+
     final static String filename = "savedVelo.txt";
     double toLong=0;
     double toLati=0;
@@ -55,6 +81,9 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
     double cur_long=0;
 
     boolean check = true;
+
+
+
     @Override
     public void onLocationChange(Location location){
         if (m_bTrackingMode) {
@@ -67,6 +96,35 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_velocity);
+        LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
+        TMapView tMapView = new TMapView(this);
+        tmapview = tMapView;
+        tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
+        linearLayoutTmap.addView( tMapView );
+
+        lm= (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        Location lastKnownLocation = lm.getLastKnownLocation(locationProvider);
+        //gps setting
+        if (lastKnownLocation != null) {
+            double lng = lastKnownLocation.getLongitude();
+            double lat = lastKnownLocation.getLatitude();
+            tmapview.setLocationPoint(lng,lat);
+            tmapview.setCenterPoint( lng,lat);
+            tmapview.setTrackingMode(true);
+            tmapview.setSightVisible(true);
+
+        }
+
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, // 등록할 위치제공자
+                100, // 통지사이의 최소 시간간격 (miliSecond)
+                5, // 통지사이의 최소 변경거리 (m)
+                mLocationListener);
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자
+                100, // 통지사이의 최소 시간간격 (miliSecond)
+                5, // 통지사이의 최소 변경거리 (m)
+                mLocationListener);
+
+
         Intent intent2 = getIntent();
         check = intent2.getBooleanExtra("check",true);
         //속력 파일 로딩
@@ -77,15 +135,12 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                 Intent intent = new Intent(setVelocity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
+            }else{
+                Toast.makeText(getApplicationContext(), "평소 다니는 거리와 이동시간을 설정해주세요.", Toast.LENGTH_LONG).show();
             }
         }catch (Exception e){ }
 
-        Button getVelo = (Button)findViewById(R.id.getVelo);
-        LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
-        TMapView tMapView = new TMapView(this);
-        tmapview = tMapView;
-        tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
-        linearLayoutTmap.addView( tMapView );
+
 
 
         /* 현위치 아이콘표시 */
@@ -94,14 +149,6 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
         tmapview.setZoomLevel(15);
         tmapview.setMapType(TMapView.MAPTYPE_STANDARD);
         tmapview.setLanguage(TMapView.LANGUAGE_KOREAN);
-        /* gps setting */
-        tmapgps = new TMapGpsManager(setVelocity.this);
-        tmapgps.setMinTime(1000);
-        tmapgps.setMinDistance(5);
-        tmapgps.setProvider(tmapgps.NETWORK_PROVIDER); //연결된 인터넷으로 현 위치를 받습니다.
-        //실내일 때 유용합니다.
-        //tmapgps.setProvider(tmapgps.GPS_PROVIDER); //gps로 현 위치를 잡습니다.
-        tmapgps.OpenGps();
         /*  화면중심을 단말의 현재위치로 이동 */
         tmapview.setTrackingMode(true);
         tmapview.setSightVisible(true);
@@ -119,7 +166,6 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                 @Override
                                 public void onClick(DialogInterface dialog, int which)
                                 {
-                                    Log.i("Dialog", "취소");
                                     Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
                                 }
                             })
@@ -154,7 +200,6 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                 @Override
                                 public void onClick(DialogInterface dialog, int which)
                                 {
-                                    Log.i("Dialog", "취소");
                                     Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
                                 }
                             })
@@ -173,9 +218,8 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                     markerItem1.setName("도착지"); // 마커의 타이틀 지정
                                     markerItem1.setCalloutTitle("도착지");
                                     tmapview.addMarkerItem("endMark", markerItem1); // 지도에 마커 추가
-
                                     setLoc = true;
-
+                                    setTime();
                                 }
                             })
                             .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
@@ -184,26 +228,30 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
             }
         });
 
-        getVelo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setTime();
-                }
-        });
+
     }
 
     public void setTime() {
         final EditText edittext = new EditText(this);
-
+        edittext.setInputType(InputType.TYPE_CLASS_NUMBER);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("평균 이동 시간");
+        builder.setTitle("이동 시간");
         builder.setMessage("도보로 몇 분정도 걸리시나요?");
         builder.setView(edittext);
         builder.setPositiveButton("입력",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                       time = Double.valueOf(edittext.getText().toString());
-
+                        try {
+                            time = Double.valueOf(edittext.getText().toString());
+                        }catch (NumberFormatException e){
+                            Toast.makeText(getApplicationContext(), "올바른 값이 입력되지 않았습니다.", Toast.LENGTH_LONG).show();
+                            toLong =0;
+                            toLati=0;
+                            fromLati=0;
+                            fromLong=0;
+                            setLoc = true;
+                            tmapview.removeAllMarkerItem();
+                        }
                         if (toLong > 0 && toLati > 0 && fromLati > 0 && fromLong > 0) {
                             TMapPoint tMapPointStart = new TMapPoint(toLati, toLong);
                             TMapPoint tMapPointEnd = new TMapPoint(fromLati, fromLong);
@@ -212,10 +260,7 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                 @Override
                                 public void onFindPathData(TMapPolyLine tMapPolyLine) {
                                     double distance = tMapPolyLine.getDistance();
-                                    Log.e("거리:", Double.toString(distance) );
-                                    Log.e("시간:", Double.toString(time) );
                                     velocity = distance / time;
-                                    Log.e("속력:", Double.toString(velocity) );
                                     String veloText = Double.toString(velocity);
                                     save(veloText);
                                     Intent intent = new Intent(setVelocity.this, MainActivity.class);
@@ -285,39 +330,3 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
     }
 
 }
-/*
-        TMapPoint tpoint = tmapview.getLocationPoint();
-        double Latitude = tpoint.getLatitude();
-        double Longitude = tpoint.getLongitude();
-
-        TMapPoint tMapPointStart = new TMapPoint(36.372106, 127.360373);
-        TMapPoint tMapPointEnd = new TMapPoint(36.372121, 127.358649);
-        TMapData tmapdata = new TMapData();
-        tmapdata.findPathDataAllType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataAllListenerCallback() {
-            @Override
-            public void onFindPathDataAll(Document document) {
-                Element root = document.getDocumentElement();
-                NodeList nodeListPlacemark = root.getElementsByTagName("Placemark");
-                for( int i=0; i<nodeListPlacemark.getLength(); i++ ) {
-                    NodeList nodeListPlacemarkItem = nodeListPlacemark.item(i).getChildNodes();
-                    for( int j=0; j<nodeListPlacemarkItem.getLength(); j++ ) {
-                        if( nodeListPlacemarkItem.item(j).getNodeName().equals("description") ) {
-                            Log.d("debug", nodeListPlacemarkItem.item(j).getTextContent().trim() );
-                        }
-                    }
-                }
-            }
-        });
-*/
-                  /*
-
-
-
-            tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, tMapPointStart, tMapPointEnd, new TMapData.FindPathDataListenerCallback() {
-                    @Override
-                    public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                        Log.d("거리:", new DecimalFormat("000.######").format(tMapPolyLine.getDistance()));
-                    }
-                }
-        );
-            */

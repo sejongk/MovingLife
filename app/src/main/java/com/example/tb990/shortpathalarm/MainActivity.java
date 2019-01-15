@@ -14,6 +14,7 @@ import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.AlarmClock;
@@ -73,6 +74,9 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
+    String locationProvider = LocationManager.NETWORK_PROVIDER;
+    LocationManager  lm;
+
     DecimalFormat fmt = new DecimalFormat("0");
     DecimalFormat coordi_fmt = new DecimalFormat("0.####");
 
@@ -134,6 +138,18 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapview = tMapView;
         tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
         linearLayoutTmap.addView( tMapView );
+
+        lm= (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        Location lastKnownLocation = lm.getLastKnownLocation(locationProvider);
+        //gps setting
+        if (lastKnownLocation != null) {
+            double lng = lastKnownLocation.getLongitude();
+            double lat = lastKnownLocation.getLatitude();
+            tmapview.setLocationPoint(lng,lat);
+            tmapview.setCenterPoint( lng,lat);
+            tmapview.setTrackingMode(true);
+            tmapview.setSightVisible(true);
+        }
 
         /* 현재 보는 방향 */
     //   tmapview.setCompassMode(true);
@@ -206,9 +222,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         placeType.setText(tokenizer.nextToken());
                         String tem_num = tokenizer.nextToken();
                         String tem_desc = tokenizer.nextToken();
-                        if (tem_num != null) placeNumber.setText(tem_num);
-                        if (tem_desc != null) placeDescription.setText(tem_desc);
-
+                        if (!tem_num.equals("null"))placeNumber.setText(tem_num);
+                        if (!tem_desc.equals("null")) placeDescription.setText(tem_desc);
                         dialog.show();
 
                     }
@@ -237,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.i("Dialog", "취소");
                                     Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
                                 }
                             })
@@ -246,7 +260,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                     dest_lati = tMapPoint.getLatitude();
                                     dest_long = tMapPoint.getLongitude();
                                     Toast.makeText(getApplicationContext(), "도착지가 lon=" + coordi_fmt.format(tMapPoint.getLongitude()) + "\nlat=" + coordi_fmt.format(tMapPoint.getLatitude()) + "로 설정되었습니다.", Toast.LENGTH_LONG).show();
-                                    tmapview.removeAllMarkerItem();
                                     TMapPoint tMapPointStart;
                                     if(dep_lati>0)  tMapPointStart = new TMapPoint(dep_lati, dep_long);
                                     else tMapPointStart = new TMapPoint(cur_lati, cur_long);
@@ -258,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                             tMapPolyLine.setLineWidth(2);
                                             tMapView.addTMapPolyLine("Line1", tMapPolyLine);
                                             distance = tMapPolyLine.getDistance();
-                                            Log.d("도착지 설정거리:", new DecimalFormat("0.#").format(tMapPolyLine.getDistance()));
                                             showMarkerPoint(tMapPoint);
                                         }
                                     });
@@ -276,7 +288,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                 @Override
                                 public void onClick(DialogInterface dialog, int which)
                                 {
-                                    Log.i("Dialog", "취소");
                                     Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
                                 }
                             })
@@ -286,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                 {
                                     dep_lati = tMapPoint.getLatitude(); dep_long = tMapPoint.getLongitude();
                                     Toast.makeText(getApplicationContext(), "출발지가 lon=" + coordi_fmt.format(tMapPoint.getLongitude()) + "\nlat=" + coordi_fmt.format(tMapPoint.getLatitude())+"로 설정되었습니다.", Toast.LENGTH_LONG).show();
-                                    tmapview.removeAllMarkerItem();
                                     TMapPoint tMapPointStart = new TMapPoint(dep_lati, dep_long);
                                     TMapPoint tMapPointEnd = new TMapPoint(dest_lati, dest_long);
 
@@ -297,7 +307,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                             tMapPolyLine.setLineWidth(2);
                                             tMapView.addTMapPolyLine("Line1", tMapPolyLine);
                                             distance = tMapPolyLine.getDistance();
-                                            Log.d("출발지 설정거리:", new DecimalFormat("0.#").format(tMapPolyLine.getDistance()));
                                             showMarkerPoint(tMapPoint);
 
                                         }
@@ -349,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         Intent intent2 = new Intent(MainActivity.this, setVelocity.class);
                         intent2.putExtra("check",false);
                         startActivity(intent2);
+                        finish();
                         break;
 
                     case R.id.setAlarm: // 알람설정
@@ -380,10 +390,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                     case R.id.nearBusStation: // 주변버스정류장
                         JSONObject sObj = new JSONObject();
                         try {
-                            //TMapPoint correctGps = tmapview.getTMapPointFromScreenPoint((float)cur_long, (float)cur_lati);
-                           // Log.e("좌표 transform",Double.toString(cur_lati)+"->"+Double.toString(correctGps.getLatitude()));
                             sObj.accumulate("latitude", cur_lati);
                             sObj.accumulate("longitude", cur_long);
+                            tmapview.removeAllTMapPolyLine();
                             getStops gs = new getStops(sObj);
                             gs.execute();
                         }catch (JSONException e){e.printStackTrace();}
@@ -393,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         Intent intent = new Intent(MainActivity.this, busAlarm.class);
                         if((int)dest_long == 0)    Toast.makeText(MainActivity.this,"도착지를 설정해주세요.",Toast.LENGTH_LONG).show();
                         else {
+                            tmapview.removeAllTMapPolyLine();
                             TMapPoint tMapPointStart;
                             if (dep_lati > 0) tMapPointStart = new TMapPoint(dep_lati, dep_long);
                             else tMapPointStart = new TMapPoint(cur_lati, cur_long);
@@ -429,13 +439,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         if(setting) {
             markerItem1.setName("도착지"); // 마커의 타이틀 지정
             markerItem1.setCalloutTitle("도착지");
+            tmapview.addMarkerItem("startPoint", markerItem1); // 지도에 마커 추가
+
         }
         else{
             markerItem1.setName("출발지"); // 마커의 타이틀 지정
             markerItem1.setCalloutTitle("출발지");
+            tmapview.addMarkerItem("endPoint", markerItem1); // 지도에 마커 추가
         }
         markerItem1.setCalloutSubTitle("소요시간은 "+ fmt.format(exp_time)+"분");
-        tmapview.addMarkerItem("markerItem1", markerItem1); // 지도에 마커 추가
         tmapview.setCenterPoint( point.getLongitude(), point.getLatitude() );
     }
 
@@ -455,10 +467,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapdata.findAllPOI(strObj, new TMapData.FindAllPOIListenerCallback() {
             @Override
             public void onFindAllPOI(ArrayList poiItem) {
+                if(poiItem.size()!=0){
+                    TMapPOIItem item = (TMapPOIItem) poiItem.get(0);
+                    tmapview.setZoomLevel(13);
+                }
                 for(int i = 0; i < poiItem.size(); i++) {
                     TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
                     String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n"+item.telNo+"\n"+item.desc;
                     markPOIPoint(item.getPOIPoint(), item.getPOIName(),subtitle);
+
                 }
             }
         });
