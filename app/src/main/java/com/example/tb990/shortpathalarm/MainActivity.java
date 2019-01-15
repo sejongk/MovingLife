@@ -568,7 +568,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         getMenuInflater().inflate(R.menu.menu, menu);
 
         //검색 버튼 클릭했을 때 힌트 추가
-        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        final SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
 
         //검색 버튼 클릭했을 때 searchview에 힌트 추가
@@ -578,6 +578,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchPOI(query);
+                searchView.clearFocus();
                 return true;
             }
 
