@@ -106,7 +106,7 @@ public class busArrival extends AppCompatActivity {
                         String message = "버스 타러 가야해요!";
                         Calendar calendar = Calendar.getInstance();
                         int day = calendar.get(Calendar.DAY_OF_WEEK);
-                        int hour = calendar.get(Calendar.HOUR);
+                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
                         int minutes = calendar.get(Calendar.MINUTE) + exp_minutes;
                         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
                                 .putExtra(AlarmClock.EXTRA_MESSAGE, message) //알람 메세지

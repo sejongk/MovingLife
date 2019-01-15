@@ -52,6 +52,8 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
 
     double cur_lati=0;
     double cur_long=0;
+
+    boolean check = true;
     @Override
     public void onLocationChange(Location location){
         if (m_bTrackingMode) {
@@ -64,14 +66,16 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_velocity);
-
+        Intent intent2 = getIntent();
+        check = intent2.getBooleanExtra("check",true);
         //속력 파일 로딩
         try {
             double loadVelo = Double.valueOf(load().toString());
-            if (loadVelo > 0) {
+            if (loadVelo > 0 && check) {
                 velocity = loadVelo;
                 Intent intent = new Intent(setVelocity.this, MainActivity.class);
                 startActivity(intent);
+                finish();
             }
         }catch (Exception e){ }
 
@@ -82,8 +86,7 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
         tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
         linearLayoutTmap.addView( tMapView );
 
-        /* 현재 보는 방향 */
-        tmapview.setCompassMode(true);
+
         /* 현위치 아이콘표시 */
         tmapview.setIconVisibility(true);
         /* 줌레벨 */
@@ -197,10 +200,10 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                     Log.e("속력:", Double.toString(velocity) );
                                     String veloText = Double.toString(velocity);
                                     save(veloText);
-                                    Toast.makeText(getApplicationContext(), "속력이" + fmt.format(veloText) + "m/분으로 설정되었습니다.", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), "속력이" + fmt.format(velocity) + "m/분으로 설정되었습니다.", Toast.LENGTH_LONG).show();
                                     Intent intent = new Intent(setVelocity.this, MainActivity.class);
                                     startActivity(intent);
-
+                                    finish();
                                 }
                             });
                         } else {

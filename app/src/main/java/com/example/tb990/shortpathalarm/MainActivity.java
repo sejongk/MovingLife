@@ -73,7 +73,7 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
-    DecimalFormat fmt = new DecimalFormat("0.#");
+    DecimalFormat fmt = new DecimalFormat("0");
     DecimalFormat coordi_fmt = new DecimalFormat("0.####");
 
     ArrayList<MapPoint> busStops = new ArrayList<>();
@@ -162,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
                 viewNumber += 1;
-                Log.e("OnPressEvent"+viewNumber,"ON!!!!");
                 return false;
             }
             @Override
@@ -211,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 }else{
                     viewNumber += 1;
                     changeView();
-                    Log.e("OnPressUpEvent"+viewNumber,"ON!!!!");
                 }
 
                 return true;
@@ -222,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             @Override
             public void onLongPressEvent(ArrayList arrayList, ArrayList arrayList1, final TMapPoint tMapPoint) {
                 viewNumber += -2;
-                Log.e("PressLongEvent"+viewNumber,"ON!!!!");
                 if(setting) {
                     AlertDialog.Builder oDialog = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog);
                     oDialog.setMessage("도착지로 설정하시겠습니까?")
@@ -318,7 +315,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             @Override
             public void onClick(View v) {
                 changeView();
-                Log.e("OnClickRemainEvent"+viewNumber,"ON!!!!");
             }
         });
         remainLayout.setOnLongClickListener(new View.OnLongClickListener(){
@@ -334,16 +330,19 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-                mDrawerLayout.closeDrawers();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
 
                 int id = menuItem.getItemId();
+
                 switch (id) {
+                    case R.id.setVelocity: //속력설정
+                        Intent intent2 = new Intent(MainActivity.this, setVelocity.class);
+                        intent2.putExtra("check",false);
+                        startActivity(intent2);
+                        break;
+
                     case R.id.setAlarm: // 알람설정
-                        Log.e("distance",Double.toString(distance));
-                        Log.e("velocity",Double.toString(velocity));
                         double exp_time = distance / velocity;
-                        Log.e("time",Double.toString(exp_time));
 
                         final int exp_hour = (int)exp_time / 60;
                         final int exp_minutes = (int) exp_time % 60;
@@ -400,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         break;
 
                 }
-                return true;
+                return false;
             }
         });
     }
@@ -419,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             markerItem1.setName("출발지"); // 마커의 타이틀 지정
             markerItem1.setCalloutTitle("출발지");
         }
-        markerItem1.setCalloutSubTitle("소요시간은 "+ fmt.format(exp_time));
+        markerItem1.setCalloutSubTitle("소요시간은 "+ fmt.format(exp_time)+"분");
         tmapview.addMarkerItem("markerItem1", markerItem1); // 지도에 마커 추가
         tmapview.setCenterPoint( point.getLongitude(), point.getLatitude() );
     }
