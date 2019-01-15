@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
+import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
@@ -130,6 +131,14 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                     String test ="lon=" + fromLong + "\nlat=" +fromLati+"로  출발지가 설정되었습니다.";
                                     setLoc = false;
                                     Toast.makeText(getApplicationContext(), test, Toast.LENGTH_LONG).show();
+                                    TMapMarkerItem markerItem1 = new TMapMarkerItem();
+                                    TMapPoint tMapPoint1 = new TMapPoint(fromLati,fromLong); // SKT타워
+                                    markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
+                                    markerItem1.setTMapPoint( tMapPoint1 ); // 마커의 좌표 지정
+                                    markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부
+                                    markerItem1.setName("출발지"); // 마커의 타이틀 지정
+                                    markerItem1.setCalloutTitle("출발지");
+                                    tmapview.addMarkerItem("startMark", markerItem1); // 지도에 마커 추가
 
                                 }
                             })
@@ -156,6 +165,15 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                     toLati = tMapPoint.getLatitude(); toLong = tMapPoint.getLongitude();
                                     String test ="lon=" + toLong + "\nlat=" +toLati+"로  도착지가 설정되었습니다.";
                                     Toast.makeText(getApplicationContext(), test, Toast.LENGTH_LONG).show();
+                                    TMapMarkerItem markerItem1 = new TMapMarkerItem();
+                                    TMapPoint tMapPoint1 = new TMapPoint(toLati,toLong); // SKT타워
+                                    markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
+                                    markerItem1.setTMapPoint( tMapPoint1 ); // 마커의 좌표 지정
+                                    markerItem1.setCanShowCallout(true); // 풍선뷰 사용 여부
+                                    markerItem1.setName("도착지"); // 마커의 타이틀 지정
+                                    markerItem1.setCalloutTitle("도착지");
+                                    tmapview.addMarkerItem("endMark", markerItem1); // 지도에 마커 추가
+
                                     setLoc = true;
 
                                 }
