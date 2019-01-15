@@ -442,9 +442,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             public void onFindAllPOI(ArrayList poiItem) {
                 for(int i = 0; i < poiItem.size(); i++) {
                     TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
-                    String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n";
-                    if(item.desc != null) subtitle += item.desc+"\n";
-                    if(item.telNo != null) subtitle += "전화번호는 "+item.telNo+"입니다.";
+                    String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n"+item.desc+"\n"+item.telNo;
                     markPOIPoint(item.getPOIPoint(), item.getPOIName(),subtitle);
                 }
             }
