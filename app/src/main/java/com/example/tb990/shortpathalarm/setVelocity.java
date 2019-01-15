@@ -200,7 +200,6 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                     Log.e("속력:", Double.toString(velocity) );
                                     String veloText = Double.toString(velocity);
                                     save(veloText);
-                                    Toast.makeText(getApplicationContext(), "속력이" + fmt.format(velocity) + "m/분으로 설정되었습니다.", Toast.LENGTH_LONG).show();
                                     Intent intent = new Intent(setVelocity.this, MainActivity.class);
                                     startActivity(intent);
                                     finish();

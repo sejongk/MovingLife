@@ -342,23 +342,29 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         break;
 
                     case R.id.setAlarm: // 알람설정
-                        double exp_time = distance / velocity;
+                        if(dest_lati>0) {
+                            double exp_time = distance / velocity;
+                            final int exp_hour = (int) exp_time / 60;
+                            final int exp_minutes = (int) exp_time % 60;
+                            TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                        final int exp_hour = (int)exp_time / 60;
-                        final int exp_minutes = (int) exp_time % 60;
-                        TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                mHour = hourOfDay - exp_hour ;
-                                mMinute = minute - exp_minutes;
-                                if(mMinute < 0){
-                                    mHour--;
-                                    mMinute = 60+mMinute;
+                                    mHour = hourOfDay - exp_hour;
+                                    mMinute = minute - exp_minutes;
+                                    if (mMinute < 0) {
+                                        mHour--;
+                                        mMinute = 60 + mMinute;
+                                    }
+                                    createAlarm("약속시간 지키기", mHour, mMinute);
                                 }
-                                createAlarm("약속시간 지키기",mHour,mMinute);
-                            }
-                        };
-                        new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
+                            };
+                            new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
+                        }
+                        else{
+                            Toast.makeText(MainActivity.this,"도착지를 설정해야합니다.",Toast.LENGTH_LONG).show();
+
+                        }
                         break;
 
                     case R.id.nearBusStation: // 주변버스정류장
