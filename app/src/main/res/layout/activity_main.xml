@@ -30,9 +30,7 @@
                     android:layout_height="46dp"
                     android:layout_margin="10dp"
                     android:background="@drawable/bg_actionbar"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark">
-                    <!--android:background="?attr/colorPrimary"-->
-                    <!--android:layout_height="?attr/actionBarSize"-->
+                    android:theme="@style/ThemeOverlay.AppCompat.Light">
                 </android.support.v7.widget.Toolbar>
                 <LinearLayout
                     android:id="@+id/remainPart"
@@ -47,5 +45,6 @@
                 app:headerLayout="@layout/drawer_header"
                 app:menu="@menu/drawer"/>
         </android.support.v4.widget.DrawerLayout>
+
     </FrameLayout>
 </android.support.constraint.ConstraintLayout>
