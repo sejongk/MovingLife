@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">shortPathAlarm</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">MovingLife</string>
+    <string name="hello_world">Moving Life!</string>
     <string name="action_settings">미구현</string>
     <string name="setAlarm">알람설정</string>
     <string name="search">장소검색</string>

@@ -197,10 +197,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         placeName.setText(tokenizer.nextToken());
                         placeAddress.setText(tokenizer.nextToken());
                         placeType.setText(tokenizer.nextToken());
-                        String desc = tokenizer.nextToken();
-                        String phoneNum = tokenizer.nextToken();
-                        if(desc != null) placeDescription.setText(desc);
-                        if(phoneNum != null ) placeNumber.setText(phoneNum);
                         dialog.show();
                     }
                 }else{
