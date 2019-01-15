@@ -35,6 +35,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class setVelocity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback{
+    DecimalFormat fmt = new DecimalFormat("0.#");
+
     final static String filename = "savedVelo.txt";
     double toLong=0;
     double toLati=0;
@@ -67,7 +69,6 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
         try {
             double loadVelo = Double.valueOf(load().toString());
             if (loadVelo > 0) {
-                Toast.makeText(getApplicationContext(), "설정된 속력은" + loadVelo + "m/분 입니다.", Toast.LENGTH_LONG).show();
                 velocity = loadVelo;
                 Intent intent = new Intent(setVelocity.this, MainActivity.class);
                 startActivity(intent);
@@ -196,6 +197,7 @@ public class setVelocity extends AppCompatActivity implements TMapGpsManager.onL
                                     Log.e("속력:", Double.toString(velocity) );
                                     String veloText = Double.toString(velocity);
                                     save(veloText);
+                                    Toast.makeText(getApplicationContext(), "속력이" + fmt.format(veloText) + "m/분으로 설정되었습니다.", Toast.LENGTH_LONG).show();
                                     Intent intent = new Intent(setVelocity.this, MainActivity.class);
                                     startActivity(intent);
 
