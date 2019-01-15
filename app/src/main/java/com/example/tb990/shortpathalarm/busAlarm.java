@@ -149,7 +149,7 @@ public class busAlarm extends AppCompatActivity {
                         String endName = subObj.getString("endName");
                         double endX = subObj.getDouble("endX");
                         double endY = subObj.getDouble("endY");
-                        dataList.add(new PathItem(2,distance,sectionTime,busNo,startName,endName,stationCount));
+                        dataList.add(new PathItem(2,distance,sectionTime,busNo,startName,endName,stationCount,Double.toString(endX),Double.toString(endY)));
                         //버스 정류장 추가
                         for(int j=1;j<=stationCount;j++){
                             JSONObject station = stations.getJSONObject(j-1);

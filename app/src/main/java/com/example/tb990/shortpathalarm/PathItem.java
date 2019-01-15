@@ -48,7 +48,7 @@ public class PathItem {
         this.next_Y = next_Y;
     }
     //                        dataList.add(new PathItem(2,distance,sectionTime,busNo,startName,endName,stationCount));
-    PathItem(int type, int distance, int sectionTime, String busNo, String startName, String endName, int stationCount){
+    PathItem(int type, int distance, int sectionTime, String busNo, String startName, String endName, int stationCount,String endX, String endY){
         this.path_type = type;
         this.path_distance = distance;
         this.path_sectionTime = sectionTime;
@@ -56,5 +56,7 @@ public class PathItem {
         this.startName = startName;
         this.endName = endName;
         this.stationCount = stationCount;
+        this.cordi_X = endX;
+        this.cordi_Y = endY;
     }
 }
