@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#00ff0000"
+    android:layout_marginTop="24dp"
     tools:context="com.example.tb990.shortpathalarm.busArrival">
 
 
@@ -24,9 +25,5 @@
             android:overScrollMode="never"
             android:background="@android:color/background_light">
         </android.support.v7.widget.RecyclerView>
-
-
     </LinearLayout>
-
-
 </RelativeLayout>

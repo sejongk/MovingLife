@@ -4,14 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="24dp"
     tools:context=".busAlarm">
     <ListView
         android:id="@+id/listViewExample"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@android:color/holo_green_light"
-        android:dividerHeight="5dp"
         android:clickable="true"
         android:choiceMode="singleChoice" />
-
 </android.support.constraint.ConstraintLayout>

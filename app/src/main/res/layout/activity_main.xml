@@ -22,14 +22,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="24dp"
                 android:orientation="vertical">
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:layout_marginTop="24dp"
-                    android:background="?attr/colorPrimary"
+                    android:layout_height="46dp"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/bg_actionbar"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark">
+                    <!--android:background="?attr/colorPrimary"-->
+                    <!--android:layout_height="?attr/actionBarSize"-->
                 </android.support.v7.widget.Toolbar>
                 <LinearLayout
                     android:id="@+id/remainPart"

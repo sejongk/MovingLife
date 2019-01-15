@@ -28,7 +28,7 @@ dependencies {
     implementation files('libs/com.skt.Tmap_1.57.jar')
     implementation 'com.android.support:design:28.0.0'
     implementation "com.android.support:recyclerview-v7:28.0.0"
-    compile group: 'com.kakao.sdk', name: 'kakaolink', version: project.KAKAO_SDK_VERSION
-    compile 'com.google.code.findbugs:jsr305:2.0.1'
-    compile project(':SDK_release_v1.0')
+    implementation group: 'com.kakao.sdk', name: 'kakaolink', version: project.KAKAO_SDK_VERSION
+    implementation 'com.google.code.findbugs:jsr305:2.0.1'
+    implementation project(':SDK_release_v1.0')
 }

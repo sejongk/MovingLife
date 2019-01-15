@@ -256,7 +256,7 @@ public class busAlarm extends AppCompatActivity {
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 convertView = inflater.inflate(R.layout.row_item, parent, false);
                 viewHolder.txtName = (TextView) convertView.findViewById(R.id.itemname);
-                viewHolder.txtType = (TextView) convertView.findViewById(R.id.itemtype);
+                //viewHolder.txtType = (TextView) convertView.findViewById(R.id.itemtype);
                 viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.distance);
          //       viewHolder.info = (ImageView) convertView.findViewById(R.id.sectime);
                 result=convertView;
@@ -268,7 +268,7 @@ public class busAlarm extends AppCompatActivity {
 
             lastPosition = position;
             viewHolder.txtName.setText(dataModel.name);
-            viewHolder.txtType.setText(Integer.toString(dataModel.path_type));
+            //viewHolder.txtType.setText(Integer.toString(dataModel.path_type));
             viewHolder.txtVersion.setText(Integer.toString(dataModel.path_distance));
 //            viewHolder.info.setOnClickListener(this);
    //         viewHolder.info.setTag(position);

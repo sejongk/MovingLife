@@ -582,8 +582,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.action_settings:
-                return true;
+            //case R.id.action_settings:
+             //   return true;
         }
 
         return super.onOptionsItemSelected(item);
