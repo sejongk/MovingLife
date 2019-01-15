@@ -3,6 +3,7 @@ package com.example.tb990.shortpathalarm;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.SearchManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,7 +36,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -126,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             }
         }catch (Exception e){ }
 
+
+
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
         final TMapView tMapView = new TMapView(this);
         tmapview = tMapView;
@@ -197,12 +200,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         placeName.setText(tokenizer.nextToken());
                         placeAddress.setText(tokenizer.nextToken());
                         placeType.setText(tokenizer.nextToken());
-                        String desc = tokenizer.nextToken();
-                        String phoneNum = tokenizer.nextToken();
-                        if(desc != null) placeDescription.setText(desc);
-                        if(phoneNum != null ) placeNumber.setText(phoneNum);
-
+                        if(tokenizer.hasMoreTokens()){String desc = tokenizer.nextToken();placeDescription.setText(desc);}
+                        if(tokenizer.hasMoreTokens()){String phoneNum = tokenizer.nextToken();placeNumber.setText(phoneNum);}
                         dialog.show();
+
                     }
                 }else{
                     viewNumber += 1;
@@ -306,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_dehaze_black_24dp);
         actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         LinearLayout remainLayout = (LinearLayout)findViewById(R.id.remainPart);
 
@@ -366,19 +368,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         final String strObj = edittext.getText().toString(); //검색어
-                                        tmapview.removeAllMarkerItem();
-                                        tmapdata.findAllPOI(strObj, new TMapData.FindAllPOIListenerCallback() {
-                                            @Override
-                                            public void onFindAllPOI(ArrayList poiItem) {
-                                                for(int i = 0; i < poiItem.size(); i++) {
-                                                    TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
-                                                    String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n";
-                                                            if(item.desc != null) subtitle += item.desc+"\n";
-                                                            if(item.telNo != null) subtitle += "전화번호는 "+item.telNo+"입니다.";
-                                                    markPOIPoint(item.getPOIPoint(), item.getPOIName(),subtitle);
-                                                }
-                                            }
-                                        });
+
                                     }
                                 });
                         builder.setNegativeButton("취소",
@@ -462,6 +452,21 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         markerItem1.setCalloutTitle(name);
         markerItem1.setCalloutSubTitle(subtitle);
         tmapview.addMarkerItem("POI" + point.toString(), markerItem1); // 지도에 마커 추가
+    }
+    public void searchPOI(String strObj){
+        tmapview.removeAllMarkerItem();
+        tmapdata.findAllPOI(strObj, new TMapData.FindAllPOIListenerCallback() {
+            @Override
+            public void onFindAllPOI(ArrayList poiItem) {
+                for(int i = 0; i < poiItem.size(); i++) {
+                    TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
+                    String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n";
+                    if(item.desc != null) subtitle += item.desc+"\n";
+                    if(item.telNo != null) subtitle += "전화번호는 "+item.telNo+"입니다.";
+                    markPOIPoint(item.getPOIPoint(), item.getPOIName(),subtitle);
+                }
+            }
+        });
     }
 
     public void createAlarm(String message, int hour, int minutes) {
@@ -584,6 +589,31 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+
+        //검색 버튼 클릭했을 때 힌트 추가
+        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        //검색 버튼 클릭했을 때 searchview에 힌트 추가
+        searchView.setQueryHint("장소를 검색합니다.");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchPOI(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        if(null!=searchManager){
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        }
+        searchView.setIconifiedByDefault(true);
         return true;
     }
 
@@ -598,6 +628,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.action_search:
+                return true;
+
+
             //case R.id.action_settings:
              //   return true;
         }
