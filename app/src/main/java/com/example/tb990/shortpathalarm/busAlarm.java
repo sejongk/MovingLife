@@ -109,6 +109,7 @@ public class busAlarm extends AppCompatActivity {
     }
 
     void busAlarmStart(){
+
         alarmFlag = true;
         lm= (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, // 등록할 위치제공자
