@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         Dialog dialog = new Dialog(MainActivity.this);
                         dialog.setContentView(R.layout.custom_dialog);
                         dialog.setTitle("장소 상세정보");
-                        TextView tv = (TextView) dialog.findViewById(R.id.text);
+                        TextView tv = (TextView) dialog.findViewById(R.id.placeDescription);
                         String content = marker.getCalloutSubTitle();
                         tv.setText(content);
                         dialog.show();

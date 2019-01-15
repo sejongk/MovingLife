@@ -5,12 +5,69 @@
     android:layout_height="300dp"
     android:padding="10dip" >
 
-
-    <TextView
-        android:id="@+id/text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dip"
-        android:textColor="#000" />
-
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/placeName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="22sp"
+            tools:text="던킨도너츠"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="25sp"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="주소"/>
+            <TextView
+                android:id="@+id/placeAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="주소 내용"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="25sp">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="분류"/>
+            <TextView
+                android:id="@+id/placeType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="업종내용"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="25sp">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="전화번호"/>
+            <TextView
+                android:id="@+id/phoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="전화번호"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="소개"/>
+            <TextView
+                android:id="@+id/placeDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="소개내용"/>
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>
