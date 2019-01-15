@@ -69,6 +69,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
     DecimalFormat fmt = new DecimalFormat("0.#");
@@ -186,9 +187,21 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         Dialog dialog = new Dialog(MainActivity.this);
                         dialog.setContentView(R.layout.custom_dialog);
                         dialog.setTitle("장소 상세정보");
-                        TextView tv = (TextView) dialog.findViewById(R.id.placeDescription);
+                        TextView placeName = (TextView) dialog.findViewById(R.id.placeName);
+                        TextView placeAddress = (TextView) dialog.findViewById(R.id.placeAddress);
+                        TextView placeType = (TextView) dialog.findViewById(R.id.placeType);
+                        TextView placeNumber = (TextView) dialog.findViewById(R.id.phoneNumber);
+                        TextView placeDescription = (TextView) dialog.findViewById(R.id.placeDescription);
                         String content = marker.getCalloutSubTitle();
-                        tv.setText(content);
+                        StringTokenizer tokenizer = new StringTokenizer(content,"\n");
+                        placeName.setText(tokenizer.nextToken());
+                        placeAddress.setText(tokenizer.nextToken());
+                        placeType.setText(tokenizer.nextToken());
+                        String desc = tokenizer.nextToken();
+                        String phoneNum = tokenizer.nextToken();
+                        if(desc != null) placeDescription.setText(desc);
+                        if(phoneNum != null ) placeNumber.setText(phoneNum);
+
                         dialog.show();
                     }
                 }else{
