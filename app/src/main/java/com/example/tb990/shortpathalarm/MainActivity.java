@@ -1,5 +1,6 @@
 package com.example.tb990.shortpathalarm;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -22,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -97,12 +100,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     //side slide
     private DrawerLayout mDrawerLayout;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mContext = this;
+        //EditText test = (EditText)findViewById(R.id.editText);
+        //test.setVisibility(View.INVISIBLE);
 
         try {
             double loadVelo = Double.valueOf(load().toString());
@@ -114,10 +119,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         }catch (Exception e){ }
 
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.linearLayoutTmap);
-       final TMapView tMapView = new TMapView(this);
-       tmapview = tMapView;
-       tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
-       linearLayoutTmap.addView( tMapView );
+        final TMapView tMapView = new TMapView(this);
+        tmapview = tMapView;
+        tMapView.setSKTMapApiKey("60540fe3-19c2-4b66-9a2e-442a7f53e860");
+        linearLayoutTmap.addView( tMapView );
 
         /* 현재 보는 방향 */
     //   tmapview.setCompassMode(true);
@@ -142,34 +147,35 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         //     Bitmap icon = Bitmap.decodeResource(getResources(),R.drawable.locicon);
     //    tMapView.setIcon();
         //void setTMapPathIcon(Bitmap start, Bitmap end)
-
         tMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
             @Override
             public boolean onPressEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
+                viewNumber += 1;
+                Log.e("OnPressEvent"+viewNumber,"ON!!!!");
                 return false;
             }
             @Override
             public boolean onPressUpEvent(ArrayList arrayList, ArrayList arrayList1, TMapPoint tMapPoint, PointF pointF) {
-                for(int i=0;i<arrayList.size();i++){
-                    TMapMarkerItem marker = (TMapMarkerItem)arrayList.get(i);
+                if(arrayList.size() >0) {
+                    viewNumber+=-1;
+                    TMapMarkerItem marker = (TMapMarkerItem) arrayList.get(0);
                     String markerid = marker.getID();
-                    if(markerid.substring(0,3).equals("bus")){
+                    if (markerid.substring(0, 3).equals("bus")) {
                         final String id = markerid.substring(3);
                         final TMapPoint markerPoint = marker.getTMapPoint();
                         TMapPoint bus_start;
-                        if(dep_lati>0)  bus_start = new TMapPoint(dep_lati, dep_long);
+                        if (dep_lati > 0) bus_start = new TMapPoint(dep_lati, dep_long);
                         else bus_start = new TMapPoint(cur_lati, cur_long);
                         tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, bus_start, markerPoint, new TMapData.FindPathDataListenerCallback() {
-                        @Override
-                        public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                            Intent intent = new Intent(MainActivity.this, busArrival.class);
-                            intent.putExtra("id",id);
-                            intent.putExtra("time",(tMapPolyLine.getDistance() / velocity));
-                            startActivity(intent);
-                        }
-                    });
-                    }
-                    if(markerid.substring(0,3).equals("POI")) {
+                            @Override
+                            public void onFindPathData(TMapPolyLine tMapPolyLine) {
+                                Intent intent = new Intent(MainActivity.this, busArrival.class);
+                                intent.putExtra("id", id);
+                                intent.putExtra("time", (tMapPolyLine.getDistance() / velocity));
+                                startActivity(intent);
+                            }
+                        });
+                    } if (markerid.substring(0, 3).equals("POI")) {
                         Dialog dialog = new Dialog(MainActivity.this);
                         dialog.setContentView(R.layout.custom_dialog);
                         dialog.setTitle("장소 상세정보");
@@ -178,7 +184,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         tv.setText(content);
                         dialog.show();
                     }
+                }else{
+                    viewNumber += 1;
+                    changeView();
+                    Log.e("OnPressUpEvent"+viewNumber,"ON!!!!");
                 }
+
                 return true;
             }
         });
@@ -186,6 +197,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tMapView.setOnLongClickListenerCallback(new TMapView.OnLongClickListenerCallback() {
             @Override
             public void onLongPressEvent(ArrayList arrayList, ArrayList arrayList1, final TMapPoint tMapPoint) {
+                viewNumber += -2;
+                Log.e("PressLongEvent"+viewNumber,"ON!!!!");
                 if(setting) {
                     AlertDialog.Builder oDialog = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog);
                     oDialog.setMessage("도착지로 설정하시겠습니까?")
@@ -264,23 +277,32 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             .show();
                 }
             }
+
         });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_dehaze_black_24dp);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        LinearLayout remainLayout = (LinearLayout)findViewById(R.id.remain_part);
+        LinearLayout remainLayout = (LinearLayout)findViewById(R.id.remainPart);
+
         remainLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 changeView();
+                Log.e("OnClickRemainEvent"+viewNumber,"ON!!!!");
             }
         });
-
+        remainLayout.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v) {
+                changeView();
+                return true;
+            }
+        });
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -502,7 +524,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
         protected void onPostExecute(String strJson) {
             super.onPostExecute(strJson);
-            try {
+            try{
                 tmapview.removeAllMarkerItem();
                 ArrayList<MapPoint> tmp_bus = new ArrayList<>();
                 JSONArray arr = new JSONArray(strJson);
@@ -554,13 +576,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         //LinearLayout view1 = (LinearLayout) findViewById(R.id.linearLayoutTmap) ;
         DrawerLayout view2 = (DrawerLayout) findViewById(R.id.drawer_layout) ;
         switch (viewNumber) {
-            case 0 :
+            case 2 :
                 view2.setVisibility(View.VISIBLE) ;
-                viewNumber=1;
-                break ;
-            case 1 :
-                view2.setVisibility(View.INVISIBLE) ;
                 viewNumber=0;
+                break ;
+            case 0:
+                view2.setVisibility(View.INVISIBLE) ;
                 break ;
         }
     }

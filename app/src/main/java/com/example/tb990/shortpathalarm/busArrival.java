@@ -208,7 +208,6 @@ public class busArrival extends AppCompatActivity {
                     }
                     eventType = parser.next();
                 }
-                Log.e("!!!end", jsonArray.toString());
                 data.put("!!!data", jsonArray);
             } catch (XmlPullParserException e) {
                 e.printStackTrace();

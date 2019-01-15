@@ -9,5 +9,5 @@
     <string name="setStartEnd">출발지/도착지 설정</string>
     <string name="setStart">출발지 설정</string>
     <string name="setEnd">도착지 설정</string>
-    <string name="drawer_header_text">구현한 기능</string>
+    <string name="drawer_header_text"></string><!--slide bar 제목-->
 </resources>
