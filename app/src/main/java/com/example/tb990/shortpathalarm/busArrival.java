@@ -108,6 +108,7 @@ public class busArrival extends AppCompatActivity {
                         int day = calendar.get(Calendar.DAY_OF_WEEK);
                         int hour = calendar.get(Calendar.HOUR_OF_DAY);
                         int minutes = calendar.get(Calendar.MINUTE) + exp_minutes;
+                        if(minutes >= 60){ hour++; minutes -= 60;}
                         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
                                 .putExtra(AlarmClock.EXTRA_MESSAGE, message) //알람 메세지
                                 .putExtra(AlarmClock.EXTRA_HOUR, hour) // 알람 HOUR : 24시 기준
