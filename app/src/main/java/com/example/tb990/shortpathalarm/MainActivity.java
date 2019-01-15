@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         String tem_num = tokenizer.nextToken();
                         String tem_desc = tokenizer.nextToken();
                         if(tem_num != null) placeNumber.setText(tem_num);
-                        if(tem_desc != null) placeNumber.setText(tem_desc);
+                        if(tem_desc != null) placeDescription.setText(tem_desc);
 
                         dialog.show();
 
@@ -442,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             public void onFindAllPOI(ArrayList poiItem) {
                 for(int i = 0; i < poiItem.size(); i++) {
                     TMapPOIItem item = (TMapPOIItem) poiItem.get(i);
-                    String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n"+item.desc+"\n"+item.telNo;
+                    String subtitle = item.name+"\n"+item.upperAddrName+" "+item.middleAddrName+" "+item.lowerAddrName+"\n"+item.lowerBizName+"\n"+item.telNo+"\n"+item.desc;
                     markPOIPoint(item.getPOIPoint(), item.getPOIName(),subtitle);
                 }
             }
