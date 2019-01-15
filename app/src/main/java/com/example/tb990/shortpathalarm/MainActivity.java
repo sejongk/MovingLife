@@ -200,8 +200,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         placeName.setText(tokenizer.nextToken());
                         placeAddress.setText(tokenizer.nextToken());
                         placeType.setText(tokenizer.nextToken());
-                        if(tokenizer.hasMoreTokens()){String desc = tokenizer.nextToken();placeDescription.setText(desc);}
-                        if(tokenizer.hasMoreTokens()){String phoneNum = tokenizer.nextToken();placeNumber.setText(phoneNum);}
                         dialog.show();
 
                     }
@@ -357,27 +355,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             }
                         };
                         new TimePickerDialog(MainActivity.this, mTimeSetListener, mHour, mMinute, false).show();
-                        break;
-
-                    case R.id.search: // 검색
-                        final EditText edittext = new EditText(MainActivity.this);
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setTitle("장소 검색");
-                        builder.setView(edittext);
-                        builder.setPositiveButton("검색",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        final String strObj = edittext.getText().toString(); //검색어
-
-                                    }
-                                });
-                        builder.setNegativeButton("취소",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                });
-                        builder.show();
                         break;
 
                     case R.id.nearBusStation: // 주변버스정류장
