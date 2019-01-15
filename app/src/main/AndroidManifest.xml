@@ -16,19 +16,14 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".designActivity"></activity>
-        <activity android:name=".setVelocity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".setVelocity" >
         </activity>
-        <activity android:name=".busArrival"></activity>
+        <activity android:name=".busArrival" />
+        <activity android:name=".busAlarm"/>
+        <activity android:name=".walkMap"></activity>
     </application>
 
 </manifest>

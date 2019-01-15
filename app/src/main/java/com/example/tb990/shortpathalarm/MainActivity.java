@@ -7,6 +7,9 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
@@ -20,6 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +63,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,8 +112,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
-        //EditText test = (EditText)findViewById(R.id.editText);
-        //test.setVisibility(View.INVISIBLE);
 
         try {
             double loadVelo = Double.valueOf(load().toString());
@@ -373,6 +377,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                     case R.id.nearBusStation: // 주변버스정류장
                         JSONObject sObj = new JSONObject();
                         try {
+                            //TMapPoint correctGps = tmapview.getTMapPointFromScreenPoint((float)cur_long, (float)cur_lati);
+                           // Log.e("좌표 transform",Double.toString(cur_lati)+"->"+Double.toString(correctGps.getLatitude()));
                             sObj.accumulate("latitude", cur_lati);
                             sObj.accumulate("longitude", cur_long);
                             getStops gs = new getStops(sObj);
@@ -381,8 +387,18 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                         break;
 
                     case R.id.busTest : //버스테스트
-                        Intent intent = new Intent(MainActivity.this, busArrival.class);
-                        startActivity(intent);
+                        Intent intent = new Intent(MainActivity.this, busAlarm.class);
+                        if((int)dest_long == 0)    Toast.makeText(MainActivity.this,"도착지를 설정해주세요.",Toast.LENGTH_LONG).show();
+                        else {
+                            TMapPoint tMapPointStart;
+                            if (dep_lati > 0) tMapPointStart = new TMapPoint(dep_lati, dep_long);
+                            else tMapPointStart = new TMapPoint(cur_lati, cur_long);
+                            intent.putExtra("SX", Double.toString(tMapPointStart.getLongitude()));
+                            intent.putExtra("SY", Double.toString(tMapPointStart.getLatitude()));
+                            intent.putExtra("EX", Double.toString(dest_long));
+                            intent.putExtra("EY", Double.toString(dest_lati));
+                            startActivity(intent);
+                        }
                         break;
 
                     case R.id.setStart:
@@ -533,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                     MapPoint point = new MapPoint(obj.getString("name"), Double.valueOf(obj.getString("latitude")), Double.valueOf(obj.getString("longitude")));
                     tmp_bus.add(point);
                     TMapMarkerItem markerItem1 = new TMapMarkerItem();
-                    TMapPoint tMapPoint1 = new TMapPoint(point.getLatitude(), point.getLongitude()); // SKT타워
+                    TMapPoint tMapPoint1 = new TMapPoint(point.getLatitude(),point.getLongitude()); // SKT타워
                     markerItem1.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
                     markerItem1.setTMapPoint(tMapPoint1); // 마커의 좌표 지정
                     markerItem1.setName(obj.getString("name")); // 마커의// 타이틀 지정
@@ -583,6 +599,20 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             case 0:
                 view2.setVisibility(View.INVISIBLE) ;
                 break ;
+        }
+    }
+    private void printKeyHash() {
+        try{
+            PackageInfo info = getPackageManager().getPackageInfo("com.example.tb990.shortpathalarm", PackageManager.GET_SIGNATURES);
+            for(Signature signature:info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("keyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch(PackageManager.NameNotFoundException e){
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
     }
 }
